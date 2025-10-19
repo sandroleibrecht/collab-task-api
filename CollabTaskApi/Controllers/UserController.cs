@@ -9,31 +9,48 @@ namespace CollabTaskApi.Controllers
 	[ApiController]
 	public class UserController : ControllerBase
 	{
-		private readonly UserService _service;
+		private readonly IUserService _service;
 
-		public UserController(UserService service)
+		public UserController(IUserService service)
 		{
 			_service = service;
 		}
+		
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+		{
+			var users = await _service.GetAll();
+
+			var dtos = users.Select(u => new UserDto
+			{
+				Id = u.Id,
+				Name = u.Name,
+				Email = u.Email,
+			});
+
+			return Ok(dtos);
+		}
 
 		[HttpPost]
-		public ActionResult CreateUser(UserCreateDto dto)
+		public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto dto)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
 
-			var user = _service.Create(dto);
-
-			return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
+			var createdUser = await _service.Create(new User { Name = dto.Name, Email = dto.Email });
+			return CreatedAtAction(nameof(GetAllUsers), new { id = createdUser.Id }, createdUser);
 		}
 
-		[HttpGet]
-		public ActionResult<IEnumerable<User>> GetAllUsers()
+		[HttpDelete]
+		public async Task<ActionResult> DeleteUser(int id)
 		{
-			var users = _service.GetAll();
-			return Ok(users);
+			var success = await _service.Delete(id);
+
+			if (!success) return NotFound();
+
+			return Ok(success);
 		}
 	}
 }

@@ -1,4 +1,6 @@
+using CollabTaskApi.Data;
 using CollabTaskApi.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi
 {
@@ -9,9 +11,11 @@ namespace CollabTaskApi
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
-			builder.Services.AddSingleton<UserService>();
+			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddScoped<IUserService, UserService>();
+			builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 
-            builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();

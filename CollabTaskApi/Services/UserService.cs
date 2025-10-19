@@ -1,25 +1,39 @@
-﻿using CollabTaskApi.DTOs;
+﻿using CollabTaskApi.Data;
 using CollabTaskApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
-	public class UserService
+	public class UserService : IUserService
 	{
-		private static readonly List<User> _users = new();
+		private readonly AppDbContext _context;
 
-		public IEnumerable<User> GetAll() => _users;
-
-		public User Create(UserCreateDto dto)
+		public UserService(AppDbContext context)
 		{
-			var user = new User
-			{
-				Id = _users.Count + 1,
-				Name = dto.Name,
-				Email = dto.Email
-			};
+			_context = context;
+		}
 
-			_users.Add(user);
+		public async Task<IEnumerable<User>> GetAll()
+		{
+			return await _context.Users.AsNoTracking().ToListAsync();
+		}
+
+		public async Task<User> Create(User user)
+		{
+			await _context.Users.AddAsync(user);
+			await _context.SaveChangesAsync();
 			return user;
+		}
+
+		public async Task<bool> Delete(int id)
+		{
+			var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
+
+			if (user == null) return false;
+
+			_context.Users.Remove(user);
+			await _context.SaveChangesAsync();
+			return true;
 		}
 	}
 }
