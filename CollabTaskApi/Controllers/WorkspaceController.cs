@@ -1,4 +1,6 @@
-﻿using CollabTaskApi.Services;
+﻿using CollabTaskApi.DTOs;
+using CollabTaskApi.Models;
+using CollabTaskApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CollabTaskApi.Controllers
@@ -15,14 +17,45 @@ namespace CollabTaskApi.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetAll()
+		public async Task<ActionResult<IEnumerable<WorkspaceDto>>> GetAll()
 		{
 			var workspaces = await _service.GetAll();
-			return Ok(workspaces);
+
+			var dtos = workspaces.Select(w => new WorkspaceDto
+			{
+				Id = w.Id,
+				Name = w.Name,
+				Description = w.Description
+			}); 
+
+			return Ok(dtos);
 		}
 
-		// Service already prepared - endpoints TBD
-		// ...
-		// ...
+		[HttpPost]
+		public async Task<ActionResult<WorkspaceDto>> Create(WorkspaceCreateDto dto)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			var workspace = await _service.Create(new Workspace { Name = dto.Name, Description = dto.Description });
+
+			var workspaceDto = new WorkspaceDto
+			{
+				Id = workspace.Id,
+				Name = workspace.Name,
+				Description = workspace.Description
+			};
+
+			return Ok(workspaceDto);
+		}
+
+		[HttpDelete]
+		public async Task<ActionResult<bool>> Delete(int id)
+		{
+			bool success = await _service.Delete(id);
+			return success ? Ok(success) : BadRequest();
+		}
 	}
 }
