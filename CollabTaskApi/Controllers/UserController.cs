@@ -1,5 +1,5 @@
-﻿using CollabTaskApi.Models;
-using CollabTaskApi.DTOs;
+﻿using CollabTaskApi.DTOs;
+using CollabTaskApi.Models;
 using CollabTaskApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +17,7 @@ namespace CollabTaskApi.Controllers
 		}
 		
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+		public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
 		{
 			var users = await _service.GetAll();
 
@@ -31,20 +31,48 @@ namespace CollabTaskApi.Controllers
 			return Ok(dtos);
 		}
 
-		[HttpPost]
-		public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto dto)
+		[HttpGet("{id:int}")]
+		public async Task<ActionResult<UserDto?>> GetById(int id)
 		{
-			if (!ModelState.IsValid)
+			var user = await _service.GetById(id);
+			if (user == null) return NotFound();
+			return Ok(new UserDto
 			{
-				return BadRequest(ModelState);
-			}
-
-			var createdUser = await _service.Create(new User { Name = dto.Name, Email = dto.Email });
-			return CreatedAtAction(nameof(GetAllUsers), new { id = createdUser.Id }, createdUser);
+				Id = user.Id,
+				Name = user.Name,
+				Email = user.Email
+			});
 		}
 
-		[HttpDelete]
-		public async Task<ActionResult> DeleteUser(int id)
+		[HttpPost]
+		public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto dto)
+		{
+			var userToCreate = new User
+			{
+				Name = dto.Name,
+				Email = dto.Email,
+			};
+
+			var createdUser = await _service.Create(userToCreate);
+			return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
+		}
+
+		[HttpPut("{id:int}")]
+		public async Task<ActionResult<UserDto?>> Update(int id, [FromBody] UserUpdateDto dto)
+		{
+			// WIP TBD
+
+			var userModel = new User
+			{
+				Name = dto.Name,
+				Email = dto.Email
+			};
+			var updatedUser = _service.Update(id, userModel);
+			return BadRequest();
+		}
+
+		[HttpDelete("{id:int}")]
+		public async Task<ActionResult> Delete(int id)
 		{
 			var success = await _service.Delete(id);
 

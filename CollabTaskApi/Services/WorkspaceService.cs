@@ -19,6 +19,11 @@ namespace CollabTaskApi.Services
 			return workspaces;
 		}
 
+		public async Task<Workspace?> GetById(int id)
+		{
+			return await _context.Workspaces.AsNoTracking().SingleOrDefaultAsync(w => w.Id == id);
+		}
+
 		public async Task<Workspace> Create(Workspace workspace)
 		{
 			await _context.AddAsync(workspace);

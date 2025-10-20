@@ -31,15 +31,31 @@ namespace CollabTaskApi.Controllers
 			return Ok(dtos);
 		}
 
-		[HttpPost]
-		public async Task<ActionResult<WorkspaceDto>> Create(WorkspaceCreateDto dto)
+		[HttpGet("{id:int}")]
+		public async Task<ActionResult<WorkspaceDto>> GetById(int id)
 		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
+			var workspace = await _service.GetById(id);
 
-			var workspace = await _service.Create(new Workspace { Name = dto.Name, Description = dto.Description });
+			if (workspace == null) return NotFound();
+
+			return Ok(new WorkspaceDto
+			{
+				Id = workspace.Id,
+				Name = workspace.Name,
+				Description = workspace.Description
+			});
+		}
+
+		[HttpPost]
+		public async Task<ActionResult<WorkspaceDto>> Create([FromBody] WorkspaceCreateDto dto)
+		{
+			var workspaceToCreate = new Workspace
+			{
+				Name = dto.Name,
+				Description = dto.Description
+			};
+
+			var workspace = await _service.Create(workspaceToCreate);
 
 			var workspaceDto = new WorkspaceDto
 			{
@@ -51,7 +67,7 @@ namespace CollabTaskApi.Controllers
 			return Ok(workspaceDto);
 		}
 
-		[HttpDelete]
+		[HttpDelete("{id:int}")]
 		public async Task<ActionResult<bool>> Delete(int id)
 		{
 			bool success = await _service.Delete(id);

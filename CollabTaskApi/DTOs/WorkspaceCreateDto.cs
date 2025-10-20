@@ -4,10 +4,11 @@ namespace CollabTaskApi.DTOs
 {
 	public class WorkspaceCreateDto
 	{
-		[Required(ErrorMessage = "Name is required")]
-		[MinLength(1, ErrorMessage = "Name must be at least 1 character long")]
-		public string Name { get; set; } = "Unnamed Workspace";
+		[Required(ErrorMessage = "Name is required.")]
+		[MaxLength(50, ErrorMessage = "Name cannot exceed 50 characters.")]
+		public string Name { get; set; } = string.Empty;
 
+		[MaxLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
 		public string? Description { get; set; }
 	}
 }

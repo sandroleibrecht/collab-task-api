@@ -18,10 +18,21 @@ namespace CollabTaskApi.Services
 			return await _context.Users.AsNoTracking().ToListAsync();
 		}
 
+		public async Task<User?> GetById(int id)
+		{
+			return await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
+		}
+
 		public async Task<User> Create(User user)
 		{
 			await _context.Users.AddAsync(user);
 			await _context.SaveChangesAsync();
+			return user;
+		}
+
+		public async Task<User> Update(int id, User user)
+		{
+			// WIP TBD
 			return user;
 		}
 
