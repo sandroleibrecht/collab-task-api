@@ -1,8 +1,9 @@
 ﻿namespace CollabTaskApi.Models
 {
-	public class Image
+	public class UserImage
 	{
 		public int Id { get; set; }
+		public int UserId { get; set; }
 		public string FilePath { get; set; } = string.Empty;
 	}
 }

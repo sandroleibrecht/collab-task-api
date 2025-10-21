@@ -1,6 +1,8 @@
-﻿using CollabTaskApi.DTOs;
+﻿using AutoMapper;
+using CollabTaskApi.DTOs;
 using CollabTaskApi.Models;
 using CollabTaskApi.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CollabTaskApi.Controllers
@@ -10,24 +12,19 @@ namespace CollabTaskApi.Controllers
 	public class UserController : ControllerBase
 	{
 		private readonly IUserService _service;
+		private readonly IMapper _mapper;
 
-		public UserController(IUserService service)
+		public UserController(IUserService service, IMapper mapper)
 		{
 			_service = service;
+			_mapper = mapper;
 		}
 		
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
 		{
 			var users = await _service.GetAll();
-
-			var dtos = users.Select(u => new UserDto
-			{
-				Id = u.Id,
-				Name = u.Name,
-				Email = u.Email,
-			});
-
+			var dtos = users.Select(user => _mapper.Map<UserDto>(user));
 			return Ok(dtos);
 		}
 
@@ -36,25 +33,26 @@ namespace CollabTaskApi.Controllers
 		{
 			var user = await _service.GetById(id);
 			if (user == null) return NotFound();
-			return Ok(new UserDto
-			{
-				Id = user.Id,
-				Name = user.Name,
-				Email = user.Email
-			});
+			var userDto = _mapper.Map<UserDto>(user);
+			return Ok(userDto);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<UserDto>> Create([FromBody] UserCreateDto dto)
+		public async Task<ActionResult<UserDto>> Create(
+			[FromBody] UserCreateDto dto,
+			[FromServices] IValidator<UserCreateDto> validator)
 		{
-			var userToCreate = new User
+			var validationResult = await validator.ValidateAsync(dto);
+			
+			if (!validationResult.IsValid)
 			{
-				Name = dto.Name,
-				Email = dto.Email,
-			};
+				return BadRequest(validationResult.Errors);
+			}
 
-			var createdUser = await _service.Create(userToCreate);
-			return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
+			var userToCreate = _mapper.Map<User>(dto);
+			var createdUserDto = _mapper.Map<UserDto>(await _service.Create(userToCreate));
+
+			return CreatedAtAction(nameof(GetById), new { id = createdUserDto.Id }, createdUserDto);
 		}
 
 		[HttpPut("{id:int}")]

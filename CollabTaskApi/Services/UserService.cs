@@ -25,7 +25,8 @@ namespace CollabTaskApi.Services
 
 		public async Task<User> Create(User user)
 		{
-			await _context.Users.AddAsync(user);
+			user.CreatedAt = DateTime.UtcNow;
+			_context.Users.Add(user);
 			await _context.SaveChangesAsync();
 			return user;
 		}
