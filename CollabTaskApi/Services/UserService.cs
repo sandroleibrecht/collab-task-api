@@ -30,9 +30,10 @@ namespace CollabTaskApi.Services
 			return user;
 		}
 
-		public async Task<User> Update(int id, User user)
+		public async Task<User?> Update(User user)
 		{
-			// WIP TBD
+			_context.Users.Update(user);
+			await _context.SaveChangesAsync();
 			return user;
 		}
 

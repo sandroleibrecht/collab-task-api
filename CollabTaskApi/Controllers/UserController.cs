@@ -60,15 +60,17 @@ namespace CollabTaskApi.Controllers
 		[HttpPut("{id:int}")]
 		public async Task<ActionResult<UserDto?>> Update(int id, [FromBody] UserUpdateDto dto)
 		{
-			// WIP TBD
+			var userModel = await _service.GetById(id);
 
-			var userModel = new User
-			{
-				Name = dto.Name,
-				Email = dto.Email
-			};
-			var updatedUser = _service.Update(id, userModel);
-			return BadRequest();
+			if (userModel == null) return NotFound();
+
+			userModel.Name = dto.Name ?? userModel.Name;
+			userModel.Email = dto.Email ?? userModel.Email;
+			
+			var updatedUser = _service.Update(userModel);
+
+			if (updatedUser == null) return NotFound();
+			return Ok(updatedUser);
 		}
 
 		[HttpDelete("{id:int}")]
