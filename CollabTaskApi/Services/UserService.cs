@@ -1,6 +1,6 @@
-﻿using CollabTaskApi.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using CollabTaskApi.Data;
 using CollabTaskApi.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
@@ -31,10 +31,11 @@ namespace CollabTaskApi.Services
 			return user;
 		}
 
-		public async Task<User?> Update(User user)
+		public async Task<User> Update(User user)
 		{
 			_context.Users.Update(user);
 			await _context.SaveChangesAsync();
+			
 			return user;
 		}
 
@@ -45,7 +46,9 @@ namespace CollabTaskApi.Services
 			if (user == null) return false;
 
 			_context.Users.Remove(user);
+			
 			await _context.SaveChangesAsync();
+
 			return true;
 		}
 	}

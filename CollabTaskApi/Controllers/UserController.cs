@@ -1,6 +1,5 @@
-﻿using AutoMapper;
-using CollabTaskApi.DTOs;
-using CollabTaskApi.Models;
+﻿using CollabTaskApi.DTOs;
+using CollabTaskApi.Mappers;
 using CollabTaskApi.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -12,29 +11,26 @@ namespace CollabTaskApi.Controllers
 	public class UserController : ControllerBase
 	{
 		private readonly IUserService _service;
-		private readonly IMapper _mapper;
 
-		public UserController(IUserService service, IMapper mapper)
+		public UserController(IUserService service)
 		{
 			_service = service;
-			_mapper = mapper;
 		}
-		
-		//[HttpGet]
-		//public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
-		//{
-		//	var users = await _service.GetAll();
-		//	var dtos = users.Select(user => _mapper.Map<UserDto>(user));
-		//	return Ok(dtos);
-		//}
+
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
+		{
+			var users = await _service.GetAll();
+			var dtos = users.Select(user => UserMapper.ToDto(user));
+			return Ok(dtos);
+		}
 
 		[HttpGet("{id:int}")]
 		public async Task<ActionResult<UserDto?>> GetById(int id)
 		{
 			var user = await _service.GetById(id);
 			if (user == null) return NotFound();
-			var userDto = _mapper.Map<UserDto>(user);
-			return Ok(userDto);
+			return Ok(UserMapper.ToDto(user));
 		}
 
 		[HttpPost]
@@ -49,32 +45,37 @@ namespace CollabTaskApi.Controllers
 				return BadRequest(validationResult.Errors);
 			}
 
-			var userToCreate = _mapper.Map<User>(dto);
-			var createdUserDto = _mapper.Map<UserDto>(await _service.Create(userToCreate));
+			var createdUser = await _service.Create(UserMapper.ToUser(dto));
+			var createdUserDto = UserMapper.ToDto(createdUser);
 
 			return CreatedAtAction(nameof(GetById), new { id = createdUserDto.Id }, createdUserDto);
 		}
 
 		[HttpPut("{id:int}")]
-		public async Task<ActionResult<UserDto?>> Update(
+		public async Task<IActionResult> Update(
 			int id,
 			[FromBody] UserUpdateDto dto,
 			[FromServices] IValidator<UserUpdateDto> validator)
 		{
+			var validationResult = await validator.ValidateAsync(dto);
+			if (!validationResult.IsValid)
+			{
+				return BadRequest(validationResult.Errors);
+			}
 
-			// VALIDATION & MAPPING TBD
+			var user = await _service.GetById(id);
+			if (user == null) return NotFound();
 
-			var userModel = await _service.GetById(id);
+			var updatedUser = UserMapper.Update(user, dto);
 
-			if (userModel == null) return NotFound();
+			updatedUser = await _service.Update(updatedUser);
 
-			userModel.Name = dto.Name ?? userModel.Name;
-			userModel.Email = dto.Email ?? userModel.Email;
-			
-			var updatedUser = _service.Update(userModel);
+			if (updatedUser is null)
+			{
+				return NotFound();
+			}
 
-			if (updatedUser == null) return NotFound();
-			return Ok(updatedUser);
+			return NoContent();
 		}
 
 		[HttpDelete("{id:int}")]

@@ -1,5 +1,4 @@
-﻿using CollabTaskApi.DTOs;
-using CollabTaskApi.Models;
+﻿using CollabTaskApi.Models;
 
 namespace CollabTaskApi.Services
 {
@@ -8,7 +7,7 @@ namespace CollabTaskApi.Services
 		Task<IEnumerable<User>> GetAll();
 		Task<User?> GetById(int id);
 		Task<User> Create(User user);
-		Task<User?> Update(User user);
+		Task<User> Update(User user);
 		Task<bool> Delete(int id);
 	}
 }

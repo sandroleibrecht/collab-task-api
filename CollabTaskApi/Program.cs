@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using CollabTaskApi.Data;
-using CollabTaskApi.Mappings;
 using CollabTaskApi.Services;
 
 namespace CollabTaskApi
@@ -15,12 +14,6 @@ namespace CollabTaskApi
             builder.Services.AddControllers();
 			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddScoped<IUserService, UserService>();
-
-			// AutoMapper
-			builder.Services.AddAutoMapper(cfg =>
-			{
-				cfg.AddProfile<AppMappingProfile>();
-			});
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
