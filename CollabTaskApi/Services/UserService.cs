@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CollabTaskApi.Data;
 using CollabTaskApi.Models;
+using CollabTaskApi.Services.Interfaces;
 
 namespace CollabTaskApi.Services
 {

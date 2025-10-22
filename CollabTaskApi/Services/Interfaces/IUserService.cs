@@ -1,6 +1,6 @@
 ﻿using CollabTaskApi.Models;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Interfaces
 {
 	public interface IUserService
 	{

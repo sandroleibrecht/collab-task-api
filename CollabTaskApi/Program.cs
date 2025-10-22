@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using CollabTaskApi.Data;
 using CollabTaskApi.Services;
+using CollabTaskApi.Services.Interfaces;
 
 namespace CollabTaskApi
 {
@@ -13,7 +14,10 @@ namespace CollabTaskApi
 
             builder.Services.AddControllers();
 			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+			
+			// Service Layer
 			builder.Services.AddScoped<IUserService, UserService>();
+			builder.Services.AddScoped<IBoardService, BoardService>();
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();

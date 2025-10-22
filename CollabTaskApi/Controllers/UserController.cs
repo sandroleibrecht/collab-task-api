@@ -1,6 +1,6 @@
 ﻿using CollabTaskApi.DTOs;
 using CollabTaskApi.Mappers;
-using CollabTaskApi.Services;
+using CollabTaskApi.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
