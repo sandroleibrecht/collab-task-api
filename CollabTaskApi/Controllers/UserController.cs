@@ -20,13 +20,13 @@ namespace CollabTaskApi.Controllers
 			_mapper = mapper;
 		}
 		
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
-		{
-			var users = await _service.GetAll();
-			var dtos = users.Select(user => _mapper.Map<UserDto>(user));
-			return Ok(dtos);
-		}
+		//[HttpGet]
+		//public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
+		//{
+		//	var users = await _service.GetAll();
+		//	var dtos = users.Select(user => _mapper.Map<UserDto>(user));
+		//	return Ok(dtos);
+		//}
 
 		[HttpGet("{id:int}")]
 		public async Task<ActionResult<UserDto?>> GetById(int id)
@@ -56,8 +56,14 @@ namespace CollabTaskApi.Controllers
 		}
 
 		[HttpPut("{id:int}")]
-		public async Task<ActionResult<UserDto?>> Update(int id, [FromBody] UserUpdateDto dto)
+		public async Task<ActionResult<UserDto?>> Update(
+			int id,
+			[FromBody] UserUpdateDto dto,
+			[FromServices] IValidator<UserUpdateDto> validator)
 		{
+
+			// VALIDATION & MAPPING TBD
+
 			var userModel = await _service.GetById(id);
 
 			if (userModel == null) return NotFound();
