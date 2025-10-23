@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace CollabTaskApi.DTOs
+namespace CollabTaskApi.DTOs.User
 {
 	public class UserUpdateDtoValidator : AbstractValidator<UserUpdateDto>
 	{

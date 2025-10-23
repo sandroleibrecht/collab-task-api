@@ -1,4 +1,4 @@
-﻿namespace CollabTaskApi.DTOs
+﻿namespace CollabTaskApi.DTOs.User
 {
 	public class UserDto
 	{
