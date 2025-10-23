@@ -1,7 +1,6 @@
 ﻿using CollabTaskApi.Data;
 using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
@@ -42,7 +41,5 @@ namespace CollabTaskApi.Services
 
 			return boardDto;
 		}
-
-
 	}
 }
