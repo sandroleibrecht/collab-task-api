@@ -1,9 +1,9 @@
-﻿using CollabTaskApi.Models;
+﻿using CollabTaskApi.DTOs.Board;
 
 namespace CollabTaskApi.Services.Interfaces
 {
 	public interface IBoardService
 	{
-		Task<IEnumerable<Desk>> GetAllDesks(int userId);
+		Task<BoardDto?> GetBoardDto(int userId);
 	}
 }

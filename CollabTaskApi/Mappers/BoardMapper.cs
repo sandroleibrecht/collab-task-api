@@ -1,19 +1,19 @@
-﻿using CollabTaskApi.DTOs;
+﻿using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Models;
 
 namespace CollabTaskApi.Mappers
 {
 	public static class BoardMapper
 	{
-		public static DeskBoardViewDto ToDeskBoardViewDto(Desk d)
-		{
-			return new DeskBoardViewDto
-			{
-				Name = d.Name,
-				Color = d.Color,
-				CreatedAt = d.CreatedAt,
-				UserDeskType = "TBD" // d.UserDeskType.Name ??
-			};
-		}
+		//public static DeskBoardViewDto ToDeskBoardViewDto(UserDesk ud)
+		//{
+		//	return new DeskBoardViewDto
+		//	{
+		//		Name = ud.Desk?.Name ?? "Default desk name",
+		//		Color = ud.Desk?.Color ?? "#FFFFFF",
+		//		CreatedAt = ud.Desk?.CreatedAt ?? DateTime.UtcNow,
+		//		UserDeskType = ud.UserDeskType?.Name ?? ""
+		//	};
+		//}
 	}
 }

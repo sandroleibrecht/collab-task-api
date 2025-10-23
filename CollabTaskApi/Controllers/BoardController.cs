@@ -1,4 +1,4 @@
-﻿using CollabTaskApi.DTOs;
+﻿using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Mappers;
 using CollabTaskApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +16,12 @@ namespace CollabTaskApi.Controllers
 			_service = service;
 		}
 
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<DeskBoardViewDto>>> GetAllDesks(int userId)
+		[HttpGet("{userId:int}")]
+		public async Task<ActionResult<BoardDto?>> GetBoardDto(int userId)
 		{
-			var deskModels = await _service.GetAllDesks(userId);
-			var deskDtos = deskModels.Select(d => BoardMapper.ToDeskBoardViewDto(d));
-			return Ok(deskDtos);
+			var boardDto = await _service.GetBoardDto(userId);
+			if (boardDto is null) return BadRequest();
+			return Ok(boardDto);
 		}
 	}
 }

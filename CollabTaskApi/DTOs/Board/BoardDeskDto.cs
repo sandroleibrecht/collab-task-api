@@ -1,7 +1,8 @@
-﻿namespace CollabTaskApi.DTOs
+﻿namespace CollabTaskApi.DTOs.Board
 {
-	public class DeskBoardViewDto
+	public class BoardDeskDto
 	{
+		public int Id { get; set; }
 		public string Name { get; set; } = string.Empty;
 		public string Color { get; set; } = string.Empty;
 		public DateTime CreatedAt { get; set; }

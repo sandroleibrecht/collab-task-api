@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CollabTaskApi.Data;
+﻿using CollabTaskApi.Data;
+using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Models;
 using CollabTaskApi.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
@@ -22,6 +23,27 @@ namespace CollabTaskApi.Services
 		public async Task<User?> GetById(int id)
 		{
 			return await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
+		}
+
+		public async Task<BoardUserDto?> GetBoardUserDto(int userId)
+		{
+			var dto = await (
+				from u in _context.Users
+				join iGroup in _context.UserImages on u.Id equals iGroup.UserId into userImages
+				from i in userImages.DefaultIfEmpty()
+				where u.Id == userId
+				select new BoardUserDto
+				{
+					Id = u.Id,
+					Name = u.Name,
+					Email = u.Email,
+					ImagePath = i.FilePath
+				}
+			)
+			.AsNoTracking()
+			.FirstOrDefaultAsync();
+
+			return dto;
 		}
 
 		public async Task<User> Create(User user)

@@ -17,7 +17,9 @@ namespace CollabTaskApi
 			
 			// Service Layer
 			builder.Services.AddScoped<IUserService, UserService>();
+			builder.Services.AddScoped<IDeskService, DeskService>();
 			builder.Services.AddScoped<IBoardService, BoardService>();
+			builder.Services.AddScoped<IInviteService, InviteService>();
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
