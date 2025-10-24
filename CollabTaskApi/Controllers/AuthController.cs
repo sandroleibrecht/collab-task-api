@@ -28,10 +28,17 @@ namespace CollabTaskApi.Controllers
 			return Ok(createdUser);
 		}
 
-		//[HttpPost("signin")]
-		//public async Task<ActionResult<UserDto>> SignIn([FromBody] SignInDto dto)
-		//{
+		[HttpPost("signin")]
+		public async Task<ActionResult<AuthResponseDto>> SignIn([FromBody] SignInDto dto)
+		{
+			var authResponse = await _userService.SignInAsync(dto);
+			
+			if (authResponse is null)
+			{
+				return Unauthorized();
+			}
 
-		//}
+			return Ok(authResponse);
+		}
 	}
 }

@@ -16,7 +16,7 @@ namespace CollabTaskApi.Controllers
 		}
 
 		[HttpGet("{userId:int}")]
-		public async Task<ActionResult<BoardDto?>> GetBoardDto(int userId)
+		public async Task<ActionResult<BoardDto>> GetBoardDto(int userId)
 		{
 			var boardDto = await _service.GetBoardDto(userId);
 			if (boardDto is null) return BadRequest();

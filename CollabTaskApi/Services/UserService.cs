@@ -47,35 +47,27 @@ namespace CollabTaskApi.Services
 			return userDto;
 		}
 
-		//public async Task<IEnumerable<User>> GetAll()
-		//{
-		//	return await _context.Users.AsNoTracking().ToListAsync();
-		//}
+		public async Task<AuthResponseDto?> SignInAsync(SignInDto dto)
+		{
+			var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == dto.Email);
 
-		//public async Task<User?> GetById(int id)
-		//{
-		//	return await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
-		//}
+			if (user is null) return null;
 
-		//public async Task<User> Update(User user)
-		//{
-		//	_context.Users.Update(user);
-		//	await _context.SaveChangesAsync();
+			if (user.Password != dto.Password) return null;
 
-		//	return user;
-		//}
 
-		//public async Task<bool> Delete(int id)
-		//{
-		//	var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
+			// --- password system tbd
+			// --- jwt system tbd
 
-		//	if (user == null) return false;
 
-		//	_context.Users.Remove(user);
+			UserDto userDto = _userMapper.Map(user);
 
-		//	await _context.SaveChangesAsync();
-
-		//	return true;
-		//}
+			return new AuthResponseDto
+			{
+				AccessToken = "TestAccessToken",
+				RefreshToken = "TestRefreshToken",
+				User = userDto
+			};
+		}
 	}
 }
