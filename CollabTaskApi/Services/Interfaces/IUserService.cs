@@ -6,7 +6,7 @@ namespace CollabTaskApi.Services.Interfaces
 {
 	public interface IUserService
 	{
-		Task<BoardUserDto?> GetBoardUserDto(int userId);
+		Task<BoardUserDto?> GetBoardUserDtoAsync(int userId);
 		Task<UserDto> CreateAsync(SignUpDto user);
 		//Task<IEnumerable<User>> GetAll();
 		//Task<User?> GetById(int id);

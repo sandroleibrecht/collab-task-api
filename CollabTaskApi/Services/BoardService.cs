@@ -25,7 +25,7 @@ namespace CollabTaskApi.Services
 
 		public async Task<BoardDto?> GetBoardDto(int userId)
 		{
-			var boardUser = await _userService.GetBoardUserDto(userId);
+			var boardUser = await _userService.GetBoardUserDtoAsync(userId);
 			if (boardUser == null) return null;
 
 			var boardDesks = await _deskService.GetBoardDeskDtos(userId);

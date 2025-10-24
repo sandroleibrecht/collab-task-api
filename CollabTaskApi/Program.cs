@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 using CollabTaskApi.Data;
 using CollabTaskApi.Services;
 using CollabTaskApi.Services.Interfaces;
-using FluentValidation;
+using CollabTaskApi.Mappers;
+using CollabTaskApi.Mappers.Interfaces;
 
 namespace CollabTaskApi
 {
@@ -23,6 +25,9 @@ namespace CollabTaskApi
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+			// Mappers
+			builder.Services.AddScoped<IUserMapper, UserMapper>();
 
 			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

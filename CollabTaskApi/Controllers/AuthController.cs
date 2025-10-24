@@ -8,19 +8,23 @@ namespace CollabTaskApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class AuthController(IUserService userService) : ControllerBase
+	public class AuthController(IValidator<SignUpDto> validator, IUserService userService) : ControllerBase
 	{
+		private readonly IValidator<SignUpDto> _validator = validator;
 		private readonly IUserService _userService = userService;
 
 		[HttpPost("signup")]
-		public async Task<ActionResult<UserDto>> SignUp(
-			[FromBody] SignUpDto dto,
-			[FromServices] IValidator validator)
+		public async Task<ActionResult<UserDto>> SignUp([FromBody] SignUpDto dto)
 		{
-			// add fluentValidation
-			// var validator = ...
+			var validation = await _validator.ValidateAsync(dto);
+
+			if (!validation.IsValid)
+			{
+				return BadRequest(validation.Errors);
+			}
+
 			var createdUser = await _userService.CreateAsync(dto);
-			if (createdUser is null) return BadRequest();
+			
 			return Ok(createdUser);
 		}
 

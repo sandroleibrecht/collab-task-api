@@ -3,16 +3,18 @@ using CollabTaskApi.DTOs.Auth;
 using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.DTOs.User;
 using CollabTaskApi.Models;
+using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
-	public class UserService(AppDbContext context) : IUserService
+	public class UserService(AppDbContext context, IUserMapper userMapper) : IUserService
 	{
 		private readonly AppDbContext _context = context;
+		private readonly IUserMapper _userMapper = userMapper;
 
-		public async Task<BoardUserDto?> GetBoardUserDto(int userId)
+		public async Task<BoardUserDto?> GetBoardUserDtoAsync(int userId)
 		{
 			var dto = await (
 				from u in _context.Users
@@ -33,25 +35,14 @@ namespace CollabTaskApi.Services
 			return dto;
 		}
 
-		public async Task<UserDto> CreateAsync(SignUpDto dto) // %%%%%%%%%%%%%%%%%%%%%% TODO: Mapper bauen für DTO <-> MODEL
+		public async Task<UserDto> CreateAsync(SignUpDto dto)
 		{
-			var user = new User
-			{
-				Name = dto.Name,
-				Email = dto.Email,
-				Password = dto.Password,
-				CreatedAt = DateTime.UtcNow
-			};
+			User user = _userMapper.Map(dto);
 
 			await _context.Users.AddAsync(user);
 			await _context.SaveChangesAsync();
 
-			var userDto = new UserDto
-			{
-				Id = user.Id,
-				Name = user.Name,
-				Email = user.Email
-			};
+			UserDto userDto = _userMapper.Map(user);
 
 			return userDto;
 		}
