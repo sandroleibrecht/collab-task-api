@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
-	public class InviteService : IInviteService
+	public class InviteService(AppDbContext context) : IInviteService
 	{
-		private readonly AppDbContext _context;
-
-		public InviteService(AppDbContext context)
-		{
-			_context = context;
-		}
+		private readonly AppDbContext _context = context;
 
 		public async Task<IEnumerable<BoardDeskInvitationDto>> GetBoardDeskInvitationDtos(int userId)
 		{

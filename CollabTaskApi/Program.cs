@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CollabTaskApi.Data;
 using CollabTaskApi.Services;
 using CollabTaskApi.Services.Interfaces;
+using FluentValidation;
 
 namespace CollabTaskApi
 {
@@ -19,6 +20,9 @@ namespace CollabTaskApi
 			builder.Services.AddScoped<IDeskService, DeskService>();
 			builder.Services.AddScoped<IBoardService, BoardService>();
 			builder.Services.AddScoped<IInviteService, InviteService>();
+
+			// FluentValidation
+			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

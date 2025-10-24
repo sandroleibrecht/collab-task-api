@@ -5,13 +5,10 @@ namespace CollabTaskApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class UserController : ControllerBase
+	public class UserController(IUserService userService) : ControllerBase
 	{
-		private readonly IUserService _service;
+		private readonly IUserService _userService = userService;
 
-		public UserController(IUserService service)
-		{
-			_service = service;
-		}
+		// set image, update user, ...
 	}
 }
