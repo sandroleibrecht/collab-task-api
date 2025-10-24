@@ -11,8 +11,8 @@ namespace CollabTaskApi.Mappers
 		{
 			return new User
 			{
-				Name = src.Name,
-				Email = src.Email,
+				Name = src.Name.Trim(),
+				Email = src.Email.Trim(),
 				Password = src.Password,
 				CreatedAt = DateTime.UtcNow
 			};
