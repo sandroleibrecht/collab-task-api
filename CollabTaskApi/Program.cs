@@ -28,6 +28,7 @@ namespace CollabTaskApi
 
 			// Mappers
 			builder.Services.AddScoped<IUserMapper, UserMapper>();
+			builder.Services.AddScoped<IBoardMapper, BoardMapper>();
 
 			builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
