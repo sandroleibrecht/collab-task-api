@@ -1,25 +1,32 @@
 ﻿using CollabTaskApi.DTOs.Board;
+using CollabTaskApi.Helpers.Auth;
 using CollabTaskApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 
 namespace CollabTaskApi.Controllers
 {
-	[Route("api/[controller]")]
 	[ApiController]
-	public class BoardController : ControllerBase
+	[Route("api/[controller]")]
+	[Authorize]
+	public class BoardController(IBoardService boardService) : ControllerBase
 	{
-		private readonly IBoardService _service;
+		private readonly IBoardService _boardService = boardService;
 
-		public BoardController(IBoardService service)
+		[HttpGet]
+		[ProducesResponseType(typeof(BoardDto), StatusCodes.Status200OK)]
+		[ProducesResponseType(typeof(BoardDto), StatusCodes.Status200OK)]
+		public async Task<ActionResult<BoardDto>> GetBoardDto()
 		{
-			_service = service;
-		}
+			var userId = User.GetUserId();
+			if (userId == null) return Unauthorized();
 
-		[HttpGet("{userId:int}")]
-		public async Task<ActionResult<BoardDto>> GetBoardDto(int userId)
-		{
-			var boardDto = await _service.GetBoardDto(userId);
-			if (boardDto is null) return BadRequest();
+			var boardDto = await _boardService.GetBoardDto((int)userId);
+			if (boardDto is null)
+				return BadRequest();
+
 			return Ok(boardDto);
 		}
 	}

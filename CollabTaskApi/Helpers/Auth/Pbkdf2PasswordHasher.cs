@@ -1,8 +1,8 @@
-﻿using CollabTaskApi.Helpers.Interfaces;
+﻿using CollabTaskApi.Helpers.Auth.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CollabTaskApi.Helpers
+namespace CollabTaskApi.Helpers.Auth
 {
 	public class Pbkdf2PasswordHasher : IPasswordHasher
 	{

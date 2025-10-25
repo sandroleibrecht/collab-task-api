@@ -1,6 +1,6 @@
 using CollabTaskApi.Data;
-using CollabTaskApi.Helpers;
-using CollabTaskApi.Helpers.Interfaces;
+using CollabTaskApi.Helpers.Auth;
+using CollabTaskApi.Helpers.Auth.Interfaces;
 using CollabTaskApi.Mappers;
 using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Options;
@@ -10,6 +10,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace CollabTaskApi
@@ -22,7 +23,34 @@ namespace CollabTaskApi
 
             builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+
+			// Swagger
+			builder.Services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v1", new OpenApiInfo { Title = "CollabTask API", Version = "v1" });
+
+				var jwtSecurityScheme = new OpenApiSecurityScheme
+				{
+					BearerFormat = "JWT",
+					Name = "Authorization",
+					In = ParameterLocation.Header,
+					Type = SecuritySchemeType.Http,
+					Scheme = "bearer",
+					Description = "Enter your AccessToken below.",
+					Reference = new OpenApiReference
+					{
+						Id = JwtBearerDefaults.AuthenticationScheme,
+						Type = ReferenceType.SecurityScheme
+					}
+				};
+
+				c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{ jwtSecurityScheme, Array.Empty<string>() }
+				});
+			});
 
 			// DB
 			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));

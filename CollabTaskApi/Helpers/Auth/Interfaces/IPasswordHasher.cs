@@ -1,4 +1,4 @@
-﻿namespace CollabTaskApi.Helpers.Interfaces
+﻿namespace CollabTaskApi.Helpers.Auth.Interfaces
 {
 	public interface IPasswordHasher
 	{

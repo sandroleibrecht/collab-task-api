@@ -1,5 +1,5 @@
 ﻿using CollabTaskApi.DTOs.Auth;
-using CollabTaskApi.Helpers.Interfaces;
+using CollabTaskApi.Helpers.Auth.Interfaces;
 using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Models;
 using CollabTaskApi.Services.Interfaces;
