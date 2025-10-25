@@ -14,18 +14,20 @@ namespace CollabTaskApi.Controllers
 		IErrorMapper errorMapper,
 		IValidator<SignUpDto> signUpValidator,
 		IValidator<SignInDto> signInValidator,
+		IAuthService authService,
 		IUserService userService) : ControllerBase
 	{
 		private readonly IErrorMapper _errorMapper = errorMapper;
 		private readonly IValidator<SignUpDto> _signUpValidator = signUpValidator;
 		private readonly IValidator<SignInDto> _signInValidator = signInValidator;
+		private readonly IAuthService _authService = authService;
 		private readonly IUserService _userService = userService;
 
 		[HttpPost("signup")]
 		[Consumes("application/json")]
 		[Produces("application/json")]
-		[ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
 		[ProducesResponseType(typeof(IEnumerable<ValidationErrorDto>), StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
 		public async Task<ActionResult<UserDto>> SignUp([FromBody] SignUpDto dto)
 		{
 			var validation = await _signUpValidator.ValidateAsync(dto);
@@ -35,9 +37,14 @@ namespace CollabTaskApi.Controllers
 				return BadRequest(_errorMapper.Map(validation.Errors));
 			}
 
-			var createdUser = await _userService.CreateAsync(dto);
+			var authResponse = await _authService.SignUpAsync(dto);
 
-			return Ok(createdUser);
+			if (authResponse is null)
+			{
+				return BadRequest(/*new ApiErrorDto { Type = "RegistrationError", Message = ""}*/);
+			}
+
+			return Ok(authResponse);
 		}
 
 		[HttpPost("signin")]
@@ -55,11 +62,11 @@ namespace CollabTaskApi.Controllers
 				return BadRequest(_errorMapper.Map(validation.Errors));
 			}
 
-			var authResponse = await _userService.SignInAsync(dto);
+			var authResponse = await _authService.SignInAsync(dto);
 			
 			if (authResponse is null)
 			{
-				return Unauthorized();
+				return Unauthorized(/*new ApiErrorDto { Type = "AuthenticationError" }*/);
 			}
 
 			return Ok(authResponse);

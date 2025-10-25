@@ -5,6 +5,8 @@ using CollabTaskApi.Services;
 using CollabTaskApi.Services.Interfaces;
 using CollabTaskApi.Mappers;
 using CollabTaskApi.Mappers.Interfaces;
+using CollabTaskApi.Helpers;
+using CollabTaskApi.Helpers.Interfaces;
 
 namespace CollabTaskApi
 {
@@ -18,10 +20,14 @@ namespace CollabTaskApi
 			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 			
 			// Service Layer
+			builder.Services.AddScoped<IAuthService, AuthService>();
 			builder.Services.AddScoped<IUserService, UserService>();
 			builder.Services.AddScoped<IDeskService, DeskService>();
 			builder.Services.AddScoped<IBoardService, BoardService>();
 			builder.Services.AddScoped<IInviteService, InviteService>();
+			
+			// Helpers
+			builder.Services.AddSingleton<IPasswordHasher, PBKDF2Hasher>();
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();

@@ -1,13 +1,12 @@
-﻿using CollabTaskApi.DTOs.Auth;
-using CollabTaskApi.DTOs.Board;
-using CollabTaskApi.DTOs.User;
+﻿using CollabTaskApi.DTOs.Board;
+using CollabTaskApi.Models;
 
 namespace CollabTaskApi.Services.Interfaces
 {
 	public interface IUserService
 	{
+		Task<User?> GetUserByEmailAsync(string email);
 		Task<BoardUserDto?> GetBoardUserDtoAsync(int userId);
-		Task<UserDto> CreateAsync(SignUpDto dto);
-		Task<AuthResponseDto?> SignInAsync(SignInDto dto);
+		Task<bool> CreateAsync(User user);
 	}
 }

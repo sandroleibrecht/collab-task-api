@@ -1,7 +1,5 @@
 ﻿using CollabTaskApi.Data;
-using CollabTaskApi.DTOs.Auth;
 using CollabTaskApi.DTOs.Board;
-using CollabTaskApi.DTOs.User;
 using CollabTaskApi.Models;
 using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Services.Interfaces;
@@ -13,6 +11,11 @@ namespace CollabTaskApi.Services
 	{
 		private readonly AppDbContext _context = context;
 		private readonly IUserMapper _userMapper = userMapper;
+
+		public async Task<User?> GetUserByEmailAsync(string email)
+		{
+			return await _context.Users.SingleOrDefaultAsync(u => u.Email == email.Trim());
+		}
 
 		public async Task<BoardUserDto?> GetBoardUserDtoAsync(int userId)
 		{
@@ -35,39 +38,11 @@ namespace CollabTaskApi.Services
 			return dto;
 		}
 
-		public async Task<UserDto> CreateAsync(SignUpDto dto)
+		public async Task<bool> CreateAsync(User user)
 		{
-			User user = _userMapper.Map(dto);
-
 			await _context.Users.AddAsync(user);
 			await _context.SaveChangesAsync();
-
-			UserDto userDto = _userMapper.Map(user);
-
-			return userDto;
-		}
-
-		public async Task<AuthResponseDto?> SignInAsync(SignInDto dto)
-		{
-			var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == dto.Email);
-
-			if (user is null) return null;
-
-			if (user.Password != dto.Password) return null;
-
-
-			// --- password system tbd
-			// --- jwt system tbd
-
-
-			UserDto userDto = _userMapper.Map(user);
-
-			return new AuthResponseDto
-			{
-				AccessToken = "TestAccessToken",
-				RefreshToken = "TestRefreshToken",
-				User = userDto
-			};
+			return true;
 		}
 	}
 }
