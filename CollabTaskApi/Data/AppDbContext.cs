@@ -14,6 +14,7 @@ namespace CollabTaskApi.Data
 		public DbSet<UserDesk> UserDesks => Set<UserDesk>();
 		public DbSet<UserDeskRole> UserDeskRoles => Set<UserDeskRole>();
 		public DbSet<UserDeskType> UserDeskTypes => Set<UserDeskType>();
+		public DbSet<UserRefreshToken> UserRefreshToken => Set<UserRefreshToken>();
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -24,6 +25,7 @@ namespace CollabTaskApi.Data
 			modelBuilder.Entity<UserDesk>().ToTable("UserDesk");
 			modelBuilder.Entity<UserDeskRole>().ToTable("UserDeskRole");
 			modelBuilder.Entity<UserDeskType>().ToTable("UserDeskType");
+			modelBuilder.Entity<UserRefreshToken>().ToTable("UserRefreshToken");
 			base.OnModelCreating(modelBuilder);
 		}
 	}

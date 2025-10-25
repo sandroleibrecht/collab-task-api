@@ -1,22 +1,27 @@
-﻿using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+﻿using CollabTaskApi.Data;
+using CollabTaskApi.DTOs.Auth;
 using CollabTaskApi.Models;
 using CollabTaskApi.Options;
 using CollabTaskApi.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CollabTaskApi.Services
 {
 	public class JwtService : IJwtService
 	{
+		private readonly AppDbContext _context;
 		private readonly JwtOptions _options;
 		private readonly SymmetricSecurityKey _signingKey;
 
-		public JwtService(IOptions<JwtOptions> options)
+		public JwtService(AppDbContext context, IOptions<JwtOptions> options)
 		{
+			_context = context;
 			_options = options.Value;
 			_signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 		}
@@ -46,10 +51,45 @@ namespace CollabTaskApi.Services
 			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 
-		public string GenerateRefreshToken()
+		public async Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(User user)
 		{
-			return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+			var existing = await _context.UserRefreshToken
+				.Where(t => t.UserId == user.Id && t.ExpiresAt < DateTime.UtcNow)
+				.ToListAsync();
+
+			_context.UserRefreshToken.RemoveRange(existing);
+
+			var token = new UserRefreshToken
+			{
+				Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+				ExpiresAt = DateTime.UtcNow.AddDays(_options.RefreshTokenDays),
+				CreatedAt = DateTime.UtcNow,
+				UserId = user.Id
+			};
+
+			await _context.UserRefreshToken.AddAsync(token);
+			await _context.SaveChangesAsync();
+
+			return token;
 		}
+
+		public async Task<UserRefreshToken?> ValidateRefreshToken(RefreshTokenRequestDto dto)
+		{
+			var refreshToken = await _context.UserRefreshToken
+				.Include(t => t.User)
+				.FirstOrDefaultAsync(t => t.Token == dto.RefreshToken);
+			
+			if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+			{
+				return null;
+			}
+
+			return refreshToken;
+		}
+
+		// TBD
+		// implement service that cleans up old refreshtokens
+		//
 
 		public TokenValidationParameters GetValidationParameters() => new()
 		{

@@ -1,13 +1,15 @@
-﻿using System.Security.Claims;
+﻿using CollabTaskApi.DTOs.Auth;
 using CollabTaskApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace CollabTaskApi.Services.Interfaces
 {
 	public interface IJwtService
 	{
 		string GenerateAccessToken(User user, IEnumerable<Claim>? extraClaims = null);
-		string GenerateRefreshToken();
+		Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(User user);
+		Task<UserRefreshToken?> ValidateRefreshToken(RefreshTokenRequestDto dto);
 		TokenValidationParameters GetValidationParameters();
 	}
 }

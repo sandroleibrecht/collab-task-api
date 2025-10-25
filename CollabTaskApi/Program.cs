@@ -61,6 +61,7 @@ namespace CollabTaskApi
 			builder.Services.AddScoped<IDeskService, DeskService>();
 			builder.Services.AddScoped<IBoardService, BoardService>();
 			builder.Services.AddScoped<IInviteService, InviteService>();
+			builder.Services.AddScoped<IJwtService, JwtService>();
 			
 			// Helpers
 			builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
@@ -74,9 +75,8 @@ namespace CollabTaskApi
 			builder.Services.AddScoped<IErrorMapper, ErrorMapper>();
 
 			// JWT
-			builder.Services.AddSingleton<IJwtService, JwtService>();
 			builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
-
+			
 			var jwtConfig = builder.Configuration.GetSection("Jwt");
 			
 			var key = jwtConfig["Key"];

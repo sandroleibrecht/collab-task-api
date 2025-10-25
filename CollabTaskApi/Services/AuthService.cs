@@ -33,8 +33,7 @@ namespace CollabTaskApi.Services
 			try
 			{
 				await _userService.CreateAsync(newUser);
-				var authResponse = BuildAuthResponse(newUser);
-				return authResponse;
+				return await BuildAuthResponse(newUser);
 			}
 			catch (Exception ex)
 			{
@@ -50,18 +49,18 @@ namespace CollabTaskApi.Services
 
 			if (!_hasher.Verify(dto.Password, user.Password)) return null;
 
-			return BuildAuthResponse(user);
+			return await BuildAuthResponse(user);
 		}
 
-		private AuthResponseDto BuildAuthResponse(User user)
+		public async Task<AuthResponseDto> BuildAuthResponse(User user)
 		{
 			var access = _jwtService.GenerateAccessToken(user);
-			var refresh = _jwtService.GenerateRefreshToken();
+			var refresh = await _jwtService.GenerateAndSaveRefreshTokenAsync(user);
 
 			return new AuthResponseDto
 			{
 				AccessToken = access,
-				RefreshToken = refresh,
+				RefreshToken = refresh.Token,
 				User = _userMapper.Map(user)
 			};
 		}
