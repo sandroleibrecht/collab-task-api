@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CollabTaskApi.Helpers
 {
-	public class PBKDF2Hasher : IPasswordHasher
+	public class Pbkdf2PasswordHasher : IPasswordHasher
 	{
 		private const int SaltSize = 16;
 		private const int KeySize = 32;
@@ -29,8 +29,7 @@ namespace CollabTaskApi.Helpers
 		public bool Verify(string original, string hashString)
 		{
 			var parts = hashString.Split('.');
-			if (parts.Length != 3)
-				return false;
+			if (parts.Length != 3) return false;
 
 			var salt = Convert.FromBase64String(parts[0]);
 			var hash = Convert.FromBase64String(parts[1]);

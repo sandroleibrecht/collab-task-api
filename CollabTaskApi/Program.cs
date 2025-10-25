@@ -35,7 +35,7 @@ namespace CollabTaskApi
 			builder.Services.AddScoped<IInviteService, InviteService>();
 			
 			// Helpers
-			builder.Services.AddSingleton<IPasswordHasher, PBKDF2Hasher>();
+			builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
