@@ -5,6 +5,7 @@ using CollabTaskApi.Mappers;
 using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Options;
 using CollabTaskApi.Services;
+using CollabTaskApi.Services.Background;
 using CollabTaskApi.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -73,6 +74,9 @@ namespace CollabTaskApi
 			builder.Services.AddScoped<IUserMapper, UserMapper>();
 			builder.Services.AddScoped<IBoardMapper, BoardMapper>();
 			builder.Services.AddScoped<IErrorMapper, ErrorMapper>();
+
+			// Background services
+			builder.Services.AddHostedService<TokenCleanupService>();
 
 			// JWT
 			builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
