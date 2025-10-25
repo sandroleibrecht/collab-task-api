@@ -8,5 +8,6 @@ namespace CollabTaskApi.Services.Interfaces
 		Task<User?> GetUserByEmailAsync(string email);
 		Task<BoardUserDto?> GetBoardUserDtoAsync(int userId);
 		Task<bool> CreateAsync(User user);
+		Task<bool> DeleteAsync(int userId);
 	}
 }
