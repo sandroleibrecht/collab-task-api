@@ -6,6 +6,7 @@ using CollabTaskApi.Services;
 using CollabTaskApi.Services.Background;
 using CollabTaskApi.Services.Interfaces;
 using FluentValidation;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,8 +20,11 @@ namespace CollabTaskApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+			
+			// Serilog + use config in appsettings.json
+			builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
-            builder.Services.AddControllers();
+			builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
 
 			// Swagger
@@ -44,7 +48,6 @@ namespace CollabTaskApi
 				};
 
 				c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-
 				c.AddSecurityRequirement(new OpenApiSecurityRequirement
 				{
 					{ jwtSecurityScheme, Array.Empty<string>() }
@@ -52,7 +55,9 @@ namespace CollabTaskApi
 			});
 
 			// DB
-			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddDbContext<AppDbContext>(options => 
+				options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+			);
 			
 			// Service Layer
 			builder.Services.AddScoped<IAuthService, AuthService>();
@@ -77,11 +82,8 @@ namespace CollabTaskApi
 			var jwtConfig = builder.Configuration.GetSection("Jwt");
 			
 			var key = jwtConfig["Key"];
-			if (string.IsNullOrEmpty(key))
-				throw new InvalidOperationException("JWT Key is missing or too short.");
-			
-			if (key.Length < 16)
-				throw new InvalidOperationException("JWT Key is too short (>= 16 chars required).");
+			if (string.IsNullOrEmpty(key)) throw new InvalidOperationException("JWT Key is missing or too short.");
+			if (key.Length < 16) throw new InvalidOperationException("JWT Key is too short (>= 16 chars required).");
 
 			var issuer = jwtConfig["Issuer"];
 			var audience = jwtConfig["Audience"];
@@ -113,11 +115,10 @@ namespace CollabTaskApi
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-			
+			app.UseSerilogRequestLogging();
+			app.UseHttpsRedirection();
 			app.UseAuthentication();
             app.UseAuthorization();
-            
 			app.MapControllers();
 
             app.Run();

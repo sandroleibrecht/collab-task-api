@@ -53,12 +53,6 @@ namespace CollabTaskApi.Services
 
 		public async Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(User user)
 		{
-			var existing = await _context.UserRefreshToken
-				.Where(t => t.UserId == user.Id && t.ExpiresAt < DateTime.UtcNow)
-				.ToListAsync();
-
-			_context.UserRefreshToken.RemoveRange(existing);
-
 			var token = new UserRefreshToken
 			{
 				Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
