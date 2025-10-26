@@ -5,7 +5,6 @@ using CollabTaskApi.Services.Interfaces;
 using CollabTaskApi.Mappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
-using SQLitePCL;
 
 namespace CollabTaskApi.Controllers
 {
