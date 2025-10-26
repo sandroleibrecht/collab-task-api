@@ -10,7 +10,7 @@ namespace CollabTaskApi.Services.Background
 	{
 		private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 		private readonly ILogger<TokenCleanupService> _logger = logger;
-		private readonly TimeSpan _interval = env.IsDevelopment() ? TimeSpan.FromHours(1) : TimeSpan.FromHours(24);
+		private readonly TimeSpan _interval = env.IsDevelopment() ? TimeSpan.FromMinutes(30) : TimeSpan.FromHours(24);
 		private readonly int _retryMinutes = 5;
 		private readonly Random _random = new();
 

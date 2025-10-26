@@ -1,82 +1,66 @@
 ﻿using CollabTaskApi.DTOs.Auth;
-using CollabTaskApi.DTOs.User;
-using CollabTaskApi.DTOs.Api.Errors;
 using CollabTaskApi.Services.Interfaces;
-using CollabTaskApi.Mappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace CollabTaskApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
 	public class AuthController(
-		IErrorMapper errorMapper,
 		IValidator<SignUpDto> signUpValidator,
 		IValidator<SignInDto> signInValidator,
 		IAuthService authService,
 		IJwtService jwtService) : ControllerBase
 	{
-		private readonly IErrorMapper _errorMapper = errorMapper;
 		private readonly IValidator<SignUpDto> _signUpValidator = signUpValidator;
 		private readonly IValidator<SignInDto> _signInValidator = signInValidator;
 		private readonly IAuthService _authService = authService;
 		private readonly IJwtService _jwtService = jwtService;
 
 		[HttpPost("signup")]
-		[Consumes("application/json")]
-		[Produces("application/json")]
-		[ProducesResponseType(typeof(IEnumerable<ValidationErrorDto>), StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(typeof(ApiErrorDto), StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
-		public async Task<ActionResult<UserDto>> SignUp([FromBody] SignUpDto dto)
+		[ProducesResponseType<List<ValidationFailure>>(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType<AuthResponseDto>(StatusCodes.Status200OK)]
+		public async Task<ActionResult<AuthResponseDto>> SignUp([FromBody] SignUpDto dto)
 		{
-			var validation = await _signUpValidator.ValidateAsync(dto);
-			if (!validation.IsValid)
-				return BadRequest(_errorMapper.Map(validation.Errors));
+			var res = await _signUpValidator.ValidateAsync(dto);
+			if (!res.IsValid) return BadRequest(res.Errors);
 
-			var authResponse = await _authService.SignUpAsync(dto);
-			if (authResponse is null)
-				return BadRequest(new ApiErrorDto { Type = "SignUpError", Message = "The provided email is already in use."});
+			var auth = await _authService.SignUpAsync(dto);
+			if (auth is null) return BadRequest();
 
-			return Ok(authResponse);
+			return Ok(auth);
 		}
 
 		[HttpPost("signin")]
-		[Consumes("application/json")]
-		[Produces("application/json")]
-		[ProducesResponseType(typeof(IEnumerable<ValidationErrorDto>), StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(typeof(ApiErrorDto), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+		[ProducesResponseType<List<ValidationFailure>>(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType<AuthResponseDto>(StatusCodes.Status200OK)]
 		public async Task<ActionResult<AuthResponseDto>> SignIn([FromBody] SignInDto dto)
 		{
-			var validation = await _signInValidator.ValidateAsync(dto);
-			if (!validation.IsValid)
-				return BadRequest(_errorMapper.Map(validation.Errors));
+			var res = await _signInValidator.ValidateAsync(dto);
+			if (!res.IsValid) return BadRequest(res.Errors);
 
-			var authResponse = await _authService.SignInAsync(dto);
-			if (authResponse is null)
-				return Unauthorized(new ApiErrorDto { Type = "SignInError", Message = "Email and/or password is incorrect."});
+			var auth = await _authService.SignInAsync(dto);
+			if (auth is null) return Unauthorized();
 
-			return Ok(authResponse);
+			return Ok(auth);
 		}
 
 		[HttpPost("refresh")]
-		[Consumes("application/json")]
-		[Produces("application/json")]
-		[ProducesResponseType(typeof(ApiErrorDto), StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType<AuthResponseDto>(StatusCodes.Status200OK)]
 		public async Task<ActionResult<AuthResponseDto>> Refresh([FromBody] RefreshTokenRequestDto dto)
 		{
-			var refreshToken = await _jwtService.ValidateRefreshToken(dto);
-			if (refreshToken is null)
-				return Unauthorized(new ApiErrorDto { Type = "RefreshTokenError", Message = "Provided refresh token is invalid or expired."});
+			var token = await _jwtService.ValidateRefreshToken(dto);
+			if (token is null) return Unauthorized();
 
-			var authResponse = await _authService.BuildAuthResponse(refreshToken.User);
-			if (authResponse is null)
-				return Unauthorized(new ApiErrorDto { Type = "RefreshTokenError", Message = "Unable to build authentication response." });
+			var auth = await _authService.BuildAuthResponse(token.User);
+			if (auth is null) return Unauthorized();
 
-			return Ok(authResponse);
+			return Ok(auth);
 		}
 	}
 }

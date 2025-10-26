@@ -14,16 +14,16 @@ namespace CollabTaskApi.Controllers
 		private readonly IBoardService _boardService = boardService;
 
 		[HttpGet]
-		[ProducesResponseType(typeof(BoardDto), StatusCodes.Status200OK)]
-		[ProducesResponseType(typeof(BoardDto), StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType<BoardDto>(StatusCodes.Status200OK)]
 		public async Task<ActionResult<BoardDto>> GetBoardDto()
 		{
 			var userId = User.GetUserId();
 			if (userId == null) return Unauthorized();
 
 			var boardDto = await _boardService.GetBoardDto((int)userId);
-			if (boardDto is null)
-				return BadRequest();
+			if (boardDto is null) return BadRequest();
 
 			return Ok(boardDto);
 		}

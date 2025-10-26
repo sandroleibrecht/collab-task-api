@@ -1,8 +1,6 @@
 using CollabTaskApi.Data;
 using CollabTaskApi.Helpers.Auth;
 using CollabTaskApi.Helpers.Auth.Interfaces;
-using CollabTaskApi.Mappers;
-using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Options;
 using CollabTaskApi.Services;
 using CollabTaskApi.Services.Background;
@@ -69,11 +67,6 @@ namespace CollabTaskApi
 
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-			// Mappers
-			builder.Services.AddScoped<IUserMapper, UserMapper>();
-			builder.Services.AddScoped<IBoardMapper, BoardMapper>();
-			builder.Services.AddScoped<IErrorMapper, ErrorMapper>();
 
 			// Background services
 			builder.Services.AddHostedService<TokenCleanupService>();

@@ -1,6 +1,6 @@
 ﻿using CollabTaskApi.DTOs.Auth;
+using CollabTaskApi.DTOs.User;
 using CollabTaskApi.Helpers.Auth.Interfaces;
-using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Models;
 using CollabTaskApi.Services.Interfaces;
 
@@ -8,12 +8,10 @@ namespace CollabTaskApi.Services
 {
 	public class AuthService(
 		IUserService userService,
-		IUserMapper userMapper,
 		IPasswordHasher hasher,
 		IJwtService jwtService) : IAuthService
 	{
 		private readonly IUserService _userService = userService;
-		private readonly IUserMapper _userMapper = userMapper;
 		private readonly IPasswordHasher _hasher = hasher;
 		private readonly IJwtService _jwtService = jwtService;
 
@@ -61,7 +59,12 @@ namespace CollabTaskApi.Services
 			{
 				AccessToken = access,
 				RefreshToken = refresh.Token,
-				User = _userMapper.Map(user)
+				User = new UserDto
+				{
+					Id = user.Id,
+					Name = user.Name,
+					Email = user.Email
+				}
 			};
 		}
 	}

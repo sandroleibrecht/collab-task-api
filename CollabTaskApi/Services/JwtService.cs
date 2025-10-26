@@ -87,10 +87,6 @@ namespace CollabTaskApi.Services
 			return refreshToken;
 		}
 
-		// TBD
-		// implement service that cleans up old refreshtokens
-		//
-
 		public TokenValidationParameters GetValidationParameters() => new()
 		{
 			ValidateIssuer = true,

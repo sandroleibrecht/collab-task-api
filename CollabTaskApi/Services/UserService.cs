@@ -1,16 +1,14 @@
 ﻿using CollabTaskApi.Data;
 using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Models;
-using CollabTaskApi.Mappers.Interfaces;
 using CollabTaskApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Services
 {
-	public class UserService(AppDbContext context, IUserMapper userMapper) : IUserService
+	public class UserService(AppDbContext context) : IUserService
 	{
 		private readonly AppDbContext _context = context;
-		private readonly IUserMapper _userMapper = userMapper;
 
 		public async Task<User?> GetUserByEmailAsync(string email)
 		{
