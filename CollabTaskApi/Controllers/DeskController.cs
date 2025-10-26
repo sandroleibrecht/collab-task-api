@@ -1,7 +1,7 @@
 ﻿using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.DTOs.Desk;
-using CollabTaskApi.Helpers.Auth;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Extensions;
+using CollabTaskApi.Services.Application.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;

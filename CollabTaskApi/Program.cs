@@ -1,17 +1,13 @@
 using CollabTaskApi.Data;
-using CollabTaskApi.Helpers.Auth;
-using CollabTaskApi.Helpers.Auth.Interfaces;
 using CollabTaskApi.Options;
-using CollabTaskApi.Services;
-using CollabTaskApi.Services.Background;
-using CollabTaskApi.Services.Interfaces;
 using FluentValidation;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using CollabTaskApi.Services;
+using CollabTaskApi.Helpers;
 
 namespace CollabTaskApi
 {
@@ -20,14 +16,20 @@ namespace CollabTaskApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-			
-			// Serilog + use config in appsettings.json
-			builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 			builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
 
-			// Swagger
+			builder.Services.AddServices();
+			builder.Services.AddHelpers();
+			builder.Services.AddOptions(builder.Configuration);
+			builder.Services.AddDb(builder.Configuration);
+
+
+			// serilog
+			builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
+			// swagger
 			builder.Services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "CollabTask API", Version = "v1" });
@@ -54,40 +56,16 @@ namespace CollabTaskApi
 				});
 			});
 
-			// DB
-			builder.Services.AddDbContext<AppDbContext>(options => 
-				options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
-			);
-			
-			// Service Layer
-			builder.Services.AddScoped<IAuthService, AuthService>();
-			builder.Services.AddScoped<IUserService, UserService>();
-			builder.Services.AddScoped<IDeskService, DeskService>();
-			builder.Services.AddScoped<IBoardService, BoardService>();
-			builder.Services.AddScoped<IInviteService, InviteService>();
-			builder.Services.AddScoped<IJwtService, JwtService>();
-			
-			// Helpers
-			builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
-
 			// FluentValidation
 			builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-			// Background services
-			builder.Services.AddHostedService<TokenCleanupService>();
-
-			// JWT
-			builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 			
+			// jwt
 			var jwtConfig = builder.Configuration.GetSection("Jwt");
-			
 			var key = jwtConfig["Key"];
 			if (string.IsNullOrEmpty(key)) throw new InvalidOperationException("JWT Key is missing or too short.");
 			if (key.Length < 16) throw new InvalidOperationException("JWT Key is too short (>= 16 chars required).");
-
 			var issuer = jwtConfig["Issuer"];
 			var audience = jwtConfig["Audience"];
-
 			builder.Services
 				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>

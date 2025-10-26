@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CollabTaskApi.Helpers.Auth
+namespace CollabTaskApi.Extensions
 {
 	public static class ClaimsPrincipalExtensions
 	{

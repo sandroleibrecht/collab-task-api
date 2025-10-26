@@ -1,7 +1,7 @@
 ﻿using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.DTOs.Desk;
 
-namespace CollabTaskApi.Services.Interfaces
+namespace CollabTaskApi.Services.Application.Interfaces
 {
 	public interface IDeskService
 	{

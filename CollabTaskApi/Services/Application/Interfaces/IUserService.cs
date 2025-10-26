@@ -1,7 +1,7 @@
 ﻿using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Models;
 
-namespace CollabTaskApi.Services.Interfaces
+namespace CollabTaskApi.Services.Application.Interfaces
 {
 	public interface IUserService
 	{

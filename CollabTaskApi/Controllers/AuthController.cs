@@ -1,8 +1,8 @@
 ﻿using CollabTaskApi.DTOs.Auth;
-using CollabTaskApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using FluentValidation.Results;
+using CollabTaskApi.Services.Application.Interfaces;
 
 namespace CollabTaskApi.Controllers
 {

@@ -1,7 +1,7 @@
 ﻿using CollabTaskApi.DTOs.Board;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Services.Application.Interfaces;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Application
 {
 	public class BoardService(
 		IDeskService deskService,

@@ -1,9 +1,9 @@
 ﻿using CollabTaskApi.Data;
 using CollabTaskApi.DTOs.Board;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Services.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Application
 {
 	public class InviteService(AppDbContext context) : IInviteService
 	{

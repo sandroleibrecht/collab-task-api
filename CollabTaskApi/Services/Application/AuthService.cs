@@ -2,9 +2,9 @@
 using CollabTaskApi.DTOs.User;
 using CollabTaskApi.Helpers.Auth.Interfaces;
 using CollabTaskApi.Models;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Services.Application.Interfaces;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Application
 {
 	public class AuthService(
 		IUserService userService,

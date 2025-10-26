@@ -1,10 +1,10 @@
 ﻿using CollabTaskApi.Data;
 using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.Models;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Services.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Application
 {
 	public class UserService(AppDbContext context) : IUserService
 	{

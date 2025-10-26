@@ -1,6 +1,6 @@
 ﻿using CollabTaskApi.DTOs.Board;
 
-namespace CollabTaskApi.Services.Interfaces
+namespace CollabTaskApi.Services.Application.Interfaces
 {
 	public interface IInviteService
 	{

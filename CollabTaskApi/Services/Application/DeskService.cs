@@ -2,10 +2,10 @@
 using CollabTaskApi.DTOs.Board;
 using CollabTaskApi.DTOs.Desk;
 using CollabTaskApi.Models;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Services.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace CollabTaskApi.Services
+namespace CollabTaskApi.Services.Application
 {
 	public class DeskService(AppDbContext context) : IDeskService
 	{

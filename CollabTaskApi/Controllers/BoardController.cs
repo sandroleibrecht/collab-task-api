@@ -1,6 +1,6 @@
 ﻿using CollabTaskApi.DTOs.Board;
-using CollabTaskApi.Helpers.Auth;
-using CollabTaskApi.Services.Interfaces;
+using CollabTaskApi.Extensions;
+using CollabTaskApi.Services.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

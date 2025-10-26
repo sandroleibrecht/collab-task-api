@@ -3,7 +3,7 @@ using CollabTaskApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
-namespace CollabTaskApi.Services.Interfaces
+namespace CollabTaskApi.Services.Application.Interfaces
 {
 	public interface IJwtService
 	{
