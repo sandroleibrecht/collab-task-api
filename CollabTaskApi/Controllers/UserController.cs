@@ -1,4 +1,4 @@
-﻿using CollabTaskApi.Services.Application.Interfaces;
+﻿using CollabTaskApi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CollabTaskApi.Controllers

@@ -1,4 +1,3 @@
-using CollabTaskApi.Data;
 using CollabTaskApi.Options;
 using FluentValidation;
 using Serilog;
@@ -6,8 +5,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using CollabTaskApi.Services;
-using CollabTaskApi.Helpers;
+using CollabTaskApi.Application;
+using CollabTaskApi.Shared;
+using CollabTaskApi.Infrastructure;
 
 namespace CollabTaskApi
 {
@@ -20,11 +20,12 @@ namespace CollabTaskApi
 			builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
 
-			builder.Services.AddServices();
-			builder.Services.AddHelpers();
-			builder.Services.AddOptions(builder.Configuration);
-			builder.Services.AddDb(builder.Configuration);
+			builder.Services.AddApplication();
+			builder.Services.AddInfrastructure(builder.Configuration);
+			builder.Services.AddShared();
 
+			// options tbd
+			builder.Services.AddOptions(builder.Configuration);
 
 			// serilog
 			builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
