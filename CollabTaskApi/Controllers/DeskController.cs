@@ -19,6 +19,19 @@ namespace CollabTaskApi.Controllers
 		private readonly IValidator<CreateDeskDto> _createDeskValidator = createDeskValidator;
 		private readonly IDeskService _deskService = deskService;
 
+		[HttpGet("{deskId:int}")]
+		public async Task<ActionResult<DeskDto>> Get(int deskId)
+		{
+			var userId = User.GetUserId();
+			if (userId is null) return Unauthorized();
+
+			return new DeskDto
+			{
+				Id = deskId,
+				Name = "Test"
+			};
+		}
+
 		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		[ProducesResponseType<List<ValidationFailure>>(StatusCodes.Status400BadRequest)]
