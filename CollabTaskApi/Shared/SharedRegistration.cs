@@ -6,7 +6,7 @@ namespace CollabTaskApi.Shared
 	{
 		public static IServiceCollection AddShared(this IServiceCollection services)
 		{
-			services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+			services.AddSingleton<IPasswordHasher, Argon2PasswordHasher>();
 
 			return services;
 		}
