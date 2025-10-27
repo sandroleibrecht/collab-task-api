@@ -1,7 +1,6 @@
 using CollabTaskApi.Application;
 using CollabTaskApi.Infrastructure;
 using CollabTaskApi.Shared;
-using Serilog;
 
 namespace CollabTaskApi
 {
@@ -18,16 +17,20 @@ namespace CollabTaskApi
 			builder.Services.AddShared();
 
 			var app = builder.Build();
-            if (app.Environment.IsDevelopment())
+
+			if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-			app.UseSerilogRequestLogging();
+
+			app.UseInfrastructure();
+
 			app.UseHttpsRedirection();
 			app.UseAuthentication();
             app.UseAuthorization();
 			app.MapControllers();
+
             app.Run();
         }
     }

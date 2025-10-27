@@ -1,8 +1,8 @@
-﻿using CollabTaskApi.Domain.DTOs.Board;
+﻿using Microsoft.EntityFrameworkCore;
+using CollabTaskApi.Domain.Models;
+using CollabTaskApi.Domain.DTOs.Board;
 using CollabTaskApi.Domain.DTOs.Desk;
 using CollabTaskApi.Infrastructure.Data;
-using CollabTaskApi.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using CollabTaskApi.Application.Interfaces;
 
 namespace CollabTaskApi.Application.Services
@@ -10,7 +10,7 @@ namespace CollabTaskApi.Application.Services
 	public class DeskService(AppDbContext context) : IDeskService
 	{
 		private readonly AppDbContext _context = context;
-		private const string DefaultDeskColorHex = "#FFFFFF";
+		private const string DefaultDeskColorHex = "#FFF";
 
 		public async Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtos(int userId)
 		{

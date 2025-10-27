@@ -14,7 +14,7 @@ namespace CollabTaskApi.Domain.Validation
 			RuleFor(x => x.Color)
 				.Matches(@"^#(?:[0-9a-fA-F]{3}){1,2}$")
 				.When(x => !string.IsNullOrWhiteSpace(x.Color))
-				.WithMessage("Color must be a valid hex code.");
+				.WithMessage("Color must be a valid hex code");
 		}
 	}
 }

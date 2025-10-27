@@ -27,6 +27,13 @@ namespace CollabTaskApi.Infrastructure
 			return services;
 		}
 
+		public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
+		{
+			app.UseSerilogRequestLogging();
+
+			return app;
+		}
+
 		private static void AddDatabase(this IServiceCollection services, IConfiguration config)
 		{
 			services.AddDbContext<AppDbContext>(
