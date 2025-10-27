@@ -1,6 +1,6 @@
-﻿using CollabTaskApi.Domain.DTOs.Auth;
-using FluentValidation;
+﻿using FluentValidation;
 using System.Text.RegularExpressions;
+using CollabTaskApi.Domain.DTOs.Auth;
 
 namespace CollabTaskApi.Domain.Validation
 {
@@ -11,9 +11,7 @@ namespace CollabTaskApi.Domain.Validation
 			RuleFor(x => x.Email)
 				.Cascade(CascadeMode.Stop)
 				.NotEmpty()
-				.Must(email =>
-					!string.IsNullOrWhiteSpace(email)
-					&& Regex.IsMatch(email.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+				.Must(email => !string.IsNullOrWhiteSpace(email) && Regex.IsMatch(email.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
 				.WithMessage("Invalid email address");
 		}
 	}

@@ -10,7 +10,8 @@ namespace CollabTaskApi.Domain.Validation
 		{
 			RuleFor(x => x.Name)
 				.NotEmpty()
-				.MinimumLength(2);
+				.Must(name => (name is not null && name.Trim().Length > 2))
+				.WithMessage("Name must have a minimum length of 2 characters");
 
 			RuleFor(x => x.Email)
 				.Cascade(CascadeMode.Stop)
