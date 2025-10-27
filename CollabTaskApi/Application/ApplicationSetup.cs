@@ -3,7 +3,7 @@ using CollabTaskApi.Application.Services;
 
 namespace CollabTaskApi.Application
 {
-	public static class ApplicationRegistration
+	public static class ApplicationSetup
 	{
 		public static IServiceCollection AddApplication(this IServiceCollection services)
 		{

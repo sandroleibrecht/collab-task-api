@@ -2,7 +2,7 @@
 
 namespace CollabTaskApi.Shared
 {
-	public static class SharedRegistration
+	public static class SharedSetup
 	{
 		public static IServiceCollection AddShared(this IServiceCollection services)
 		{

@@ -2,7 +2,7 @@
 using FluentValidation;
 using System.Text.RegularExpressions;
 
-namespace CollabTaskApi.Domain.DTOs.Auth.Validators
+namespace CollabTaskApi.Domain.Validation
 {
 	public class SignUpDtoValidator : AbstractValidator<SignUpDto>
 	{

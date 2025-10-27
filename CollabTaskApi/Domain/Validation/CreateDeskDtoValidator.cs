@@ -1,7 +1,7 @@
 ﻿using CollabTaskApi.Domain.DTOs.Desk;
 using FluentValidation;
 
-namespace CollabTaskApi.Domain.DTOs.Desk.Validators
+namespace CollabTaskApi.Domain.Validation
 {
 	public class CreateDeskDtoValidator : AbstractValidator<CreateDeskDto>
 	{

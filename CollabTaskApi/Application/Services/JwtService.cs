@@ -1,8 +1,8 @@
 ﻿using CollabTaskApi.Application.Interfaces;
 using CollabTaskApi.Domain.DTOs.Auth;
 using CollabTaskApi.Domain.Models;
+using CollabTaskApi.Infrastructure.Configuration;
 using CollabTaskApi.Infrastructure.Data;
-using CollabTaskApi.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

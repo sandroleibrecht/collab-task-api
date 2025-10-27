@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CollabTaskApi.Infrastructure.Data;
 
-namespace CollabTaskApi.Infrastructure.Services
+namespace CollabTaskApi.Infrastructure.Background
 {
 	public class TokenCleanupService(
 		IServiceScopeFactory scopeFactory,

@@ -1,4 +1,4 @@
-﻿namespace CollabTaskApi.Options
+﻿namespace CollabTaskApi.Infrastructure.Configuration
 {
 	public class JwtOptions
 	{
