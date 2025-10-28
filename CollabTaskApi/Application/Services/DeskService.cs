@@ -110,19 +110,43 @@ namespace CollabTaskApi.Application.Services
 		{
 			if (desk == null) return;
 
-			var userDesks = await _context.DeskUsers.Where(ud => ud.DeskId == desk.Id).ToListAsync();
-
-			// provided user is the only member on this desk - desk & related entities can be deleted
-			if (userDesks.Count == 1)
+			var deskUsers = await _context.DeskUsers.Where(ud => ud.DeskId == desk.Id).ToListAsync();
+			if (deskUsers.Count == 1)
 			{
 				await _inviteService.DeleteAllInvitationsByDeskIdAsync(desk.Id);
-				await _context.DeskUsers.Where(ud => ud.Id == userDesks[0].Id).ExecuteDeleteAsync();
-				// tbd: UserTasks
-				// tbd: ListTasks
-				// tbd: Tasks
-				// tbd: ListDesks
-				// tbd: Lists
-				await _context.Desks.Where(d => d.Id == desk.Id).ExecuteDeleteAsync();
+				await _context.DeskUsers.Where(ud => ud.Id == deskUsers[0].Id).ExecuteDeleteAsync();
+				await _context.CardUsers.Where(cu => cu.UserId == userId).ExecuteDeleteAsync();
+
+				var deskLanes = await _context.DeskLanes
+					.Where(dl => dl.DeskId == desk.Id)
+					.ToListAsync();
+
+				var laneIds = deskLanes
+					.Select(dl => dl.LaneId)
+					.ToList();
+
+				var lanes = await _context.Lanes
+					.Where(l => laneIds.Contains(l.Id))
+					.ToListAsync();
+
+				var laneCards = await _context.LaneCards
+					.Where(lc => laneIds.Contains(lc.LaneId))
+					.ToListAsync();
+
+				var cardIds = laneCards.Select(lc => lc.CardId).ToList();
+
+				var cards = await _context.Cards
+					.Where(c => cardIds.Contains(c.Id))
+					.ToListAsync();
+
+				await _context.DeskLanes.Where(dl => laneIds.Contains(dl.LaneId)).ExecuteDeleteAsync();
+				await _context.LaneCards.Where(lc => laneIds.Contains(lc.LaneId)).ExecuteDeleteAsync();
+
+				_context.Lanes.RemoveRange(lanes);
+				_context.Cards.RemoveRange(cards);
+				_context.Desks.Remove(desk);
+
+				await _context.SaveChangesAsync();
 			}
 			else
 			{
