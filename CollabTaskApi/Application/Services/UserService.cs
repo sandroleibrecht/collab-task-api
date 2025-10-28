@@ -79,21 +79,21 @@ namespace CollabTaskApi.Application.Services
 
 		public async Task DeleteAsync(int userId)
 		{
-			var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId)
+			var user = await GetUserByIdAsync(userId)
 			?? throw new ArgumentException("Unable to find user with the provided Id");
 
-			await _imageService.DeleteUserImageAsync(user.Id);
 			await _jwtService.RemoveRefreshTokenAsync(user.Id);
 			await _inviteService.DeleteAllInvitationsByUserIdAsync(user.Id);
 
 			var desks = await _deskService.GetAllDesksAsync(userId);
-
 			foreach (var desk in desks)
 			{
 				await _deskService.HandleUserLeaveAsync(userId, desk);
 			}
 
+			await _imageService.DeleteUserImageAsync(user.Id);
 			_context.Users.Remove(user);
+			
 			await _context.SaveChangesAsync();
 		}
 	}
