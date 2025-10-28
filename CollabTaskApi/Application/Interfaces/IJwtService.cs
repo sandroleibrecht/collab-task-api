@@ -10,7 +10,7 @@ namespace CollabTaskApi.Application.Interfaces
 		string GenerateAccessToken(User user, IEnumerable<Claim>? extraClaims = null);
 		Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(User user);
 		Task<UserRefreshToken?> ValidateRefreshToken(RefreshTokenRequestDto dto);
-		TokenValidationParameters GetValidationParameters();
 		Task RemoveRefreshTokenAsync(int userId);
+		TokenValidationParameters GetValidationParameters();
 	}
 }

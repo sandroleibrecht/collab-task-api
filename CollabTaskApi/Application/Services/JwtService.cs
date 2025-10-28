@@ -35,9 +35,10 @@ namespace CollabTaskApi.Application.Services
 				new("name", user.Name)
 			};
 
-			if (extraClaims != null) claims.AddRange(extraClaims);
-
-			var creds = new SigningCredentials(_signingKey,SecurityAlgorithms.HmacSha256);
+			if (extraClaims != null)
+			{
+				claims.AddRange(extraClaims);
+			}
 
 			var token = new JwtSecurityToken(
 				issuer: _options.Issuer,
@@ -45,7 +46,7 @@ namespace CollabTaskApi.Application.Services
 				claims: claims,
 				notBefore: DateTime.UtcNow,
 				expires: DateTime.UtcNow.AddMinutes(_options.AccessTokenMinutes),
-				signingCredentials: creds
+				signingCredentials: new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256)
 			);
 
 			return new JwtSecurityTokenHandler().WriteToken(token);
