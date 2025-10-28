@@ -12,6 +12,7 @@ namespace CollabTaskApi.Application
 			services.AddScoped<IDeskService, DeskService>();
 			services.AddScoped<IBoardService, BoardService>();
 			services.AddScoped<IInviteService, InviteService>();
+			services.AddScoped<IImageService, ImageService>();
 			services.AddScoped<IJwtService, JwtService>();
 
 			return services;
