@@ -11,6 +11,6 @@ namespace CollabTaskApi.Application.Interfaces
 		Task<BoardUserDto?> GetBoardUserDtoAsync(int userId);
 		Task<bool> CreateAsync(User user);
 		Task<BoardUserDto?> UpdateAsync(int userId, UserUpdateDto dto);
-		Task<bool> DeleteAsync(int userId);
+		Task DeleteAsync(int userId);
 	}
 }

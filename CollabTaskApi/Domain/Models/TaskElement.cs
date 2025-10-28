@@ -1,6 +1,6 @@
 ﻿namespace CollabTaskApi.Domain.Models
 {
-	public class Task
+	public class TaskElement
 	{
 		public int Id { get; set; }
 		public string Name { get; set; } = string.Empty;

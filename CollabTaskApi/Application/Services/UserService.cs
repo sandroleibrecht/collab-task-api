@@ -61,12 +61,12 @@ namespace CollabTaskApi.Application.Services
 			{
 				if (currentImage is not null)
 				{
-					currentImage.FilePath = "tbd";
+					currentImage.FilePath = dto.Image;
 				}
 				else
 				{
 					newImage.UserId = userId;
-					newImage.FilePath = "tbd";
+					newImage.FilePath = dto.Image;
 					await _context.UserImages.AddAsync(newImage);
 				}
 			}
@@ -78,19 +78,25 @@ namespace CollabTaskApi.Application.Services
 				Id = user.Id,
 				Name = user.Name,
 				Email = user.Email,
-				ImagePath = "tbd"
+				ImagePath = dto.Image is null ? currentImage?.FilePath : dto.Image,
 			};
 		}
 
-		public async Task<bool> DeleteAsync(int userId)
+		public async Task DeleteAsync(int userId)
 		{
-			var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId);
-			if (user is null) return false;
-			
+			var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId)
+			?? throw new ArgumentException("Unable to find user with the provided Id");
+
+			// Remove:
+			// * UserImage
+			// * UserDesk (random anderer member wird admin)
+			// * Desk (nur die wo sonst keine member)
+			// * DeskInvitation (wo userId receiver oder sender)
+			// * UserRefreshToken
+			// * User
+
 			_context.Users.Remove(user);
 			await _context.SaveChangesAsync();
-			
-			return true;
 		}
 	}
 }
