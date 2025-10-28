@@ -7,10 +7,26 @@ using CollabTaskApi.Application.Interfaces;
 
 namespace CollabTaskApi.Application.Services
 {
-	public class DeskService(AppDbContext context) : IDeskService
+	public class DeskService(
+		AppDbContext context,
+		IInviteService inviteService) : IDeskService
 	{
 		private readonly AppDbContext _context = context;
+		private readonly IInviteService _inviteService = inviteService;
 		private const string DefaultDeskColorHex = "#FFF";
+
+		public async Task<IEnumerable<Desk>> GetAllDesksAsync(int userId)
+		{
+			var desks = await (
+				from d in _context.Desks
+				join ud in _context.UserDesks on d.Id equals ud.DeskId
+				where ud.UserId == userId
+				select d
+			)
+			.ToListAsync();
+
+			return desks;
+		}
 
 		public async Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtos(int userId)
 		{
@@ -87,6 +103,30 @@ namespace CollabTaskApi.Application.Services
 			{
 				await transaction.RollbackAsync();
 				throw new Exception(ex.Message);
+			}
+		}
+
+		public async Task HandleUserLeaveAsync(int userId, Desk desk)
+		{
+			if (desk == null) return;
+
+			var userDesks = await _context.UserDesks.Where(ud => ud.DeskId == desk.Id).ToListAsync();
+
+			// provided user is the only member on this desk - desk & related entities can be deleted
+			if (userDesks.Count == 1)
+			{
+				await _inviteService.DeleteAllInvitationsByDeskIdAsync(desk.Id);
+				await _context.UserDesks.Where(ud => ud.Id == userDesks[0].Id).ExecuteDeleteAsync();
+				// tbd: UserTasks
+				// tbd: ListTasks
+				// tbd: Tasks
+				// tbd: ListDesks
+				// tbd: Lists
+				await _context.Desks.Where(d => d.Id == desk.Id).ExecuteDeleteAsync();
+			}
+			else
+			{
+				// TBD HERE: handle leaving of desk with other members
 			}
 		}
 	}

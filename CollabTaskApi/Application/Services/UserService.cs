@@ -8,10 +8,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Application.Services
 {
-	public class UserService(AppDbContext context, IImageService imageService, IPasswordHasher hasher) : IUserService
+	public class UserService(
+		AppDbContext context,
+		IImageService imageService,
+		IDeskService deskService,
+		IJwtService jwtService,
+		IInviteService inviteService,
+		IPasswordHasher hasher) : IUserService
 	{
 		private readonly AppDbContext _context = context;
 		private readonly IImageService _imageService = imageService;
+		private readonly IDeskService _deskService = deskService;
+		private readonly IJwtService _jwtService = jwtService;
+		private readonly IInviteService _inviteService = inviteService;
 		private readonly IPasswordHasher _hasher = hasher;
 
 		public async Task<User?> GetUserByIdAsync(int id) => await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
@@ -73,15 +82,16 @@ namespace CollabTaskApi.Application.Services
 			var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId)
 			?? throw new ArgumentException("Unable to find user with the provided Id");
 
-			// Remove:
-			// [x] UserImage
-			// [ ] UserDesk (random anderer member wird admin)
-			// [ ] Desk (nur die wo sonst keine member)
-			// [ ] DeskInvitation (wo userId receiver oder sender)
-			// [ ] UserRefreshToken
-			// [ ] User
-
 			await _imageService.DeleteUserImageAsync(user.Id);
+			await _jwtService.RemoveRefreshTokenAsync(user.Id);
+			await _inviteService.DeleteAllInvitationsByUserIdAsync(user.Id);
+
+			var desks = await _deskService.GetAllDesksAsync(userId);
+
+			foreach (var desk in desks)
+			{
+				await _deskService.HandleUserLeaveAsync(userId, desk);
+			}
 
 			_context.Users.Remove(user);
 			await _context.SaveChangesAsync();

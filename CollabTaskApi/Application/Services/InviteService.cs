@@ -29,5 +29,25 @@ namespace CollabTaskApi.Application.Services
 
 			return dtos;
 		}
+
+		public async Task DeleteAllInvitationsByUserIdAsync(int userId)
+		{
+			var invites = await _context.DeskInvitations
+				.Where(i => i.ReceiverUserId == userId || i.SenderUserId == userId)
+				.ToListAsync();
+
+			_context.RemoveRange(invites);
+			await _context.SaveChangesAsync();
+		}
+
+		public async Task DeleteAllInvitationsByDeskIdAsync(int deskId)
+		{
+			var invites = await _context.DeskInvitations
+				.Where(i => i.DeskId == deskId)
+				.ToListAsync();
+
+			_context.RemoveRange(invites);
+			await _context.SaveChangesAsync();
+		}
 	}
 }

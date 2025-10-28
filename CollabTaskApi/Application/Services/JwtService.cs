@@ -81,6 +81,13 @@ namespace CollabTaskApi.Application.Services
 			return refreshToken;
 		}
 
+		public async Task RemoveRefreshTokenAsync(int userId)
+		{
+			var refreshToken = await _context.UserRefreshToken.Where(t => t.UserId == userId).ToListAsync();
+			_context.UserRefreshToken.RemoveRange(refreshToken);
+			await _context.SaveChangesAsync();
+		}
+
 		public TokenValidationParameters GetValidationParameters() => new()
 		{
 			ValidateIssuer = true,

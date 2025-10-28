@@ -11,5 +11,6 @@ namespace CollabTaskApi.Application.Interfaces
 		Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(User user);
 		Task<UserRefreshToken?> ValidateRefreshToken(RefreshTokenRequestDto dto);
 		TokenValidationParameters GetValidationParameters();
+		Task RemoveRefreshTokenAsync(int userId);
 	}
 }
