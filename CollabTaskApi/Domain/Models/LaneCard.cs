@@ -1,10 +1,10 @@
 ﻿namespace CollabTaskApi.Domain.Models
 {
-	public class ListElement
+	public class LaneCard
 	{
 		public int Id { get; set; }
-		public string Name { get; set; } = string.Empty;
-		public int Order {  get; set; }
+		public int LaneId { get; set; }
+		public int CardId { get; set; }
 		public DateTime CreatedAt { get; set; }
 	}
 }

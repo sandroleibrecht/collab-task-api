@@ -1,10 +1,10 @@
 ﻿namespace CollabTaskApi.Domain.Models
 {
-	public class TaskList
+	public class Lane
 	{
 		public int Id { get; set; }
-		public int TaskId { get; set; }
-		public int ListId { get; set; }
+		public string? Name { get; set; }
+		public int Order {  get; set; }
 		public DateTime CreatedAt { get; set; }
 	}
 }

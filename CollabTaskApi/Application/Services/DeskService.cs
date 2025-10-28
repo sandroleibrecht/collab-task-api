@@ -19,8 +19,8 @@ namespace CollabTaskApi.Application.Services
 		{
 			var desks = await (
 				from d in _context.Desks
-				join ud in _context.UserDesks on d.Id equals ud.DeskId
-				where ud.UserId == userId
+				join du in _context.DeskUsers on d.Id equals du.DeskId
+				where du.UserId == userId
 				select d
 			)
 			.ToListAsync();
@@ -31,10 +31,10 @@ namespace CollabTaskApi.Application.Services
 		public async Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtos(int userId)
 		{
 			var dtos = await (
-				from ud in _context.UserDesks
-				join d in _context.Desks on ud.DeskId equals d.Id
-				join udt in _context.UserDeskTypes on ud.UserDeskTypeId equals udt.Id
-				where ud.UserId == userId
+				from du in _context.DeskUsers
+				join d in _context.Desks on du.DeskId equals d.Id
+				join udt in _context.UserDeskTypes on du.UserDeskTypeId equals udt.Id
+				where du.UserId == userId
 				select new BoardDeskDto
 				{
 					DeskId = d.Id,
@@ -76,7 +76,7 @@ namespace CollabTaskApi.Application.Services
 					throw new InvalidOperationException("Error while getting the user deskrole/desktype.");
 				}
 
-				var userDesk = new UserDesk
+				var userDesk = new DeskUser
 				{
 					UserId = userId,
 					DeskId = desk.Id,
@@ -85,7 +85,7 @@ namespace CollabTaskApi.Application.Services
 					CreatedAt = now
 				};
 
-				await _context.UserDesks.AddAsync(userDesk);
+				await _context.DeskUsers.AddAsync(userDesk);
 				await _context.SaveChangesAsync();
 
 				await transaction.CommitAsync();
@@ -110,13 +110,13 @@ namespace CollabTaskApi.Application.Services
 		{
 			if (desk == null) return;
 
-			var userDesks = await _context.UserDesks.Where(ud => ud.DeskId == desk.Id).ToListAsync();
+			var userDesks = await _context.DeskUsers.Where(ud => ud.DeskId == desk.Id).ToListAsync();
 
 			// provided user is the only member on this desk - desk & related entities can be deleted
 			if (userDesks.Count == 1)
 			{
 				await _inviteService.DeleteAllInvitationsByDeskIdAsync(desk.Id);
-				await _context.UserDesks.Where(ud => ud.Id == userDesks[0].Id).ExecuteDeleteAsync();
+				await _context.DeskUsers.Where(ud => ud.Id == userDesks[0].Id).ExecuteDeleteAsync();
 				// tbd: UserTasks
 				// tbd: ListTasks
 				// tbd: Tasks
