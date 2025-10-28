@@ -8,9 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Application.Services
 {
-	public class UserService(AppDbContext context, IPasswordHasher hasher) : IUserService
+	public class UserService(AppDbContext context, IImageService imageService, IPasswordHasher hasher) : IUserService
 	{
 		private readonly AppDbContext _context = context;
+		private readonly IImageService _imageService = imageService;
 		private readonly IPasswordHasher _hasher = hasher;
 
 		public async Task<User?> GetUserByIdAsync(int id) => await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
@@ -53,32 +54,17 @@ namespace CollabTaskApi.Application.Services
 			user.Name = dto.Name ?? user.Name;
 			user.Email = dto.Email ?? user.Email;
 			user.Password = dto.Password is not null ? _hasher.Hash(dto.Password) : user.Password;
-
-			var currentImage = await _context.UserImages.SingleOrDefaultAsync(i => i.UserId == user.Id);
-			var newImage = new UserImage();
-
-			if (dto.Image is not null)
-			{
-				if (currentImage is not null)
-				{
-					currentImage.FilePath = dto.Image;
-				}
-				else
-				{
-					newImage.UserId = userId;
-					newImage.FilePath = dto.Image;
-					await _context.UserImages.AddAsync(newImage);
-				}
-			}
-
+			
 			await _context.SaveChangesAsync();
+
+			var image = await _imageService.UpdateUserImageAsync(user.Id, dto.Image);
 
 			return new BoardUserDto
 			{
 				Id = user.Id,
 				Name = user.Name,
 				Email = user.Email,
-				ImagePath = dto.Image is null ? currentImage?.FilePath : dto.Image,
+				ImagePath = image
 			};
 		}
 
@@ -88,12 +74,14 @@ namespace CollabTaskApi.Application.Services
 			?? throw new ArgumentException("Unable to find user with the provided Id");
 
 			// Remove:
-			// * UserImage
-			// * UserDesk (random anderer member wird admin)
-			// * Desk (nur die wo sonst keine member)
-			// * DeskInvitation (wo userId receiver oder sender)
-			// * UserRefreshToken
-			// * User
+			// [x] UserImage
+			// [ ] UserDesk (random anderer member wird admin)
+			// [ ] Desk (nur die wo sonst keine member)
+			// [ ] DeskInvitation (wo userId receiver oder sender)
+			// [ ] UserRefreshToken
+			// [ ] User
+
+			await _imageService.DeleteUserImageAsync(user.Id);
 
 			_context.Users.Remove(user);
 			await _context.SaveChangesAsync();

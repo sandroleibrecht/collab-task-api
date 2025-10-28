@@ -46,15 +46,16 @@ namespace CollabTaskApi.Domain.Validation
 
 			When(x => x.Image is not null, () =>
 			{
-				RuleFor(x => x.Image)
-					.Must(file => file!.Length > 0)
-						.WithMessage("File is empty")
-					.Must(file => AllowedImageExtensions.Contains(Path.GetExtension(file!.FileName).ToLower()))
-						.WithMessage($"Image format not allowed. Use {string.Join(", ", AllowedImageExtensions)}")
-					.Must(file => file!.Length <= MaxImageFileSize)
-						.WithMessage($"Image size not allowed. Max. {MaxImageFileSize / 1024 / 1024} MB.")
-					.Must(file => file!.ContentType.StartsWith("image/"))
-						.WithMessage("File has to be of type Image");
+				RuleFor(x => x.Image).MinimumLength(1);
+				//RuleFor(x => x.Image)
+				//	.Must(file => file!.Length > 0)
+				//		.WithMessage("File is empty")
+				//	.Must(file => AllowedImageExtensions.Contains(Path.GetExtension(file!.FileName).ToLower()))
+				//		.WithMessage($"Image format not allowed. Use {string.Join(", ", AllowedImageExtensions)}")
+				//	.Must(file => file!.Length <= MaxImageFileSize)
+				//		.WithMessage($"Image size not allowed. Max. {MaxImageFileSize / 1024 / 1024} MB.")
+				//	.Must(file => file!.ContentType.StartsWith("image/"))
+				//		.WithMessage("File has to be of type Image");
 			});
 
 
