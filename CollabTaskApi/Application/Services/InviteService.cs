@@ -30,6 +30,16 @@ namespace CollabTaskApi.Application.Services
 			return dtos;
 		}
 
+		public async Task<BoardDeskDto> AcceptInvitationAsync(int inviteId)
+		{
+			return new BoardDeskDto();
+		}
+
+		public async Task DeclineInvitationAsync(int inviteId)
+		{
+
+		}
+
 		public async Task DeleteAllInvitationsByUserIdAsync(int userId)
 		{
 			var invites = await _context.DeskInvitations
