@@ -21,17 +21,8 @@ namespace CollabTaskApi.Infrastructure.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<DeskInvitation>().ToTable("DeskInvitation");
-			modelBuilder.Entity<DeskLane>().ToTable("DeskLane");
-			modelBuilder.Entity<Lane>().ToTable("Lane");
-			modelBuilder.Entity<LaneCard>().ToTable("LaneCard");
-			modelBuilder.Entity<UserDeskRole>().ToTable("UserDeskRole");
-			modelBuilder.Entity<UserDeskType>().ToTable("UserDeskType");
-			modelBuilder.Entity<UserImage>().ToTable("UserImage");
-			modelBuilder.Entity<UserRefreshToken>().ToTable("UserRefreshToken");
-
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
+			
 			base.OnModelCreating(modelBuilder);
 		}
 	}

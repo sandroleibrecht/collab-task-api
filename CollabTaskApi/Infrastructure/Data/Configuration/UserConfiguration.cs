@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CollabTaskApi.Infrastructure.Data.Configurations
+namespace CollabTaskApi.Infrastructure.Data.Configuration
 {
 	public class UserConfiguration :IEntityTypeConfiguration<User>
 	{
