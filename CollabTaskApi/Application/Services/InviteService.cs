@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CollabTaskApi.Application.Services
 {
-	public class InviteService(AppDbContext context) : IInviteService
+	public class InviteService(AppDbContext context, IDeskService deskService) : IInviteService
 	{
 		private readonly AppDbContext _context = context;
-
+		private readonly IDeskService _deskService = deskService;
 		public async Task<IEnumerable<BoardDeskInvitationDto>> GetBoardDeskInvitationDtos(int userId)
 		{
 			var dtos = await (
@@ -32,12 +32,26 @@ namespace CollabTaskApi.Application.Services
 
 		public async Task<BoardDeskDto> AcceptInvitationAsync(int inviteId)
 		{
+			var invite = await _context.DeskInvitations.SingleOrDefaultAsync(i => i.Id == inviteId)
+			?? throw new ArgumentException("Invitation not found");
+
+			await _deskService.AddUserToDeskAsync(invite.ReceiverUserId, invite.DeskId);
+
+			_context.DeskInvitations.Remove(invite);
+			await _context.SaveChangesAsync();
+
 			return new BoardDeskDto();
 		}
 
 		public async Task DeclineInvitationAsync(int inviteId)
 		{
+			var invite = await _context.DeskInvitations.FirstOrDefaultAsync(i => i.Id == inviteId);
 
+			if (invite is not null)
+			{
+				_context.DeskInvitations.Remove(invite);
+				await _context.SaveChangesAsync();
+			}
 		}
 
 		public async Task DeleteAllInvitationsByUserIdAsync(int userId)

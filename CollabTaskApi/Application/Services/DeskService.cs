@@ -9,12 +9,10 @@ namespace CollabTaskApi.Application.Services
 {
 	public class DeskService(
 		AppDbContext context,
-		ILogger<DeskService> logger,
-		IInviteService inviteService) : IDeskService
+		ILogger<DeskService> logger) : IDeskService
 	{
 		private readonly AppDbContext _context = context;
 		private readonly ILogger<DeskService> _logger = logger;
-		private readonly IInviteService _inviteService = inviteService;
 		private const string DefaultDeskColorHex = "#FFF";
 
 		public async Task<IEnumerable<Desk>> GetAllDesksAsync(int userId)
@@ -30,7 +28,7 @@ namespace CollabTaskApi.Application.Services
 			return desks;
 		}
 
-		public async Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtos(int userId)
+		public async Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtosAsync(int userId)
 		{
 			var dtos = await (
 				from du in _context.DeskUsers
@@ -106,6 +104,46 @@ namespace CollabTaskApi.Application.Services
 				await transaction.RollbackAsync();
 				throw new Exception(ex.Message);
 			}
+		}
+
+		public async Task<BoardDeskDto> AddUserToDeskAsync(int userId, int deskId)
+		{
+			var desk = await _context.Desks.SingleOrDefaultAsync(d => d.Id == deskId)
+			?? throw new Exception("Desk not found");
+
+			var userExists = await _context.Users.AnyAsync(d => d.Id == userId);
+			if (!userExists) throw new Exception("User not found");
+
+			var alreadyMember = await _context.DeskUsers.AnyAsync(du => du.DeskId == deskId && du.UserId == userId);
+			if (alreadyMember) throw new ArgumentException("User cannot be added to the desk: User is already a member");
+
+			var userDeskRole = await _context.UserDeskRoles.FirstOrDefaultAsync(r => r.Name == "Member");
+			var userDeskType = await _context.UserDeskTypes.FirstOrDefaultAsync(t => t.Name == "Shared");
+			if (userDeskRole is null || userDeskType is null)
+			{
+				throw new InvalidOperationException("Error while getting the user deskrole/desktype.");
+			}
+
+			var deskUser = new DeskUser
+			{
+				DeskId = deskId,
+				UserId = userId,
+				UserDeskRoleId = userDeskRole.Id,
+				UserDeskTypeId = userDeskType.Id,
+				CreatedAt = DateTime.UtcNow
+			};
+
+			await _context.DeskUsers.AddAsync(deskUser);
+			await _context.SaveChangesAsync();
+
+			return new BoardDeskDto
+			{
+				DeskId = deskId,
+				Name = desk.Name,
+				Color = desk.Color,
+				CreatedAt = DateTime.UtcNow,
+				UserDeskType = userDeskType.Name
+			};
 		}
 
 		public async Task RemoveUserFromDeskAsync(int userId, int deskId)
@@ -196,7 +234,7 @@ namespace CollabTaskApi.Application.Services
 
 				_logger.LogInformation("Deleting Invitations...");
 
-				await _inviteService.DeleteAllInvitationsByDeskIdAsync(deskId);
+				var invites = await _context.DeskInvitations.Where(i => i.DeskId == deskId).ExecuteDeleteAsync();
 
 				_logger.LogInformation("Deleting Desk...");
 
