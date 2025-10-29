@@ -88,10 +88,13 @@ namespace CollabTaskApi.Application.Services
 			var desks = await _deskService.GetAllDesksAsync(userId);
 			foreach (var desk in desks)
 			{
-				await _deskService.HandleUserLeaveAsync(userId, desk);
+				await _deskService.RemoveUserFromDeskAsync(userId, desk.Id);
 			}
 
+			_context.ChangeTracker.Clear();
+
 			await _imageService.DeleteUserImageAsync(user.Id);
+
 			_context.Users.Remove(user);
 			
 			await _context.SaveChangesAsync();

@@ -9,9 +9,11 @@ namespace CollabTaskApi.Application.Services
 {
 	public class DeskService(
 		AppDbContext context,
+		ILogger<DeskService> logger,
 		IInviteService inviteService) : IDeskService
 	{
 		private readonly AppDbContext _context = context;
+		private readonly ILogger<DeskService> _logger = logger;
 		private readonly IInviteService _inviteService = inviteService;
 		private const string DefaultDeskColorHex = "#FFF";
 
@@ -106,52 +108,112 @@ namespace CollabTaskApi.Application.Services
 			}
 		}
 
-		public async Task HandleUserLeaveAsync(int userId, Desk desk)
+		public async Task RemoveUserFromDeskAsync(int userId, int deskId)
 		{
-			if (desk == null) return;
+			_logger.LogInformation("Removing User (Id: {UserId}) from Desk (Id: {DeskId})...", userId, deskId);
 
-			var deskUsers = await _context.DeskUsers.Where(ud => ud.DeskId == desk.Id).ToListAsync();
-			if (deskUsers.Count == 1)
+			var deskUsers = await _context.DeskUsers
+				.Include(du => du.UserDeskRole)
+				.Where(du => du.DeskId == deskId).ToListAsync();
+
+			if (deskUsers.Count == 1 && deskUsers[0].UserId == userId)
 			{
-				await _inviteService.DeleteAllInvitationsByDeskIdAsync(desk.Id);
-				await _context.DeskUsers.Where(ud => ud.Id == deskUsers[0].Id).ExecuteDeleteAsync();
-				await _context.CardUsers.Where(cu => cu.UserId == userId).ExecuteDeleteAsync();
+				_logger.LogInformation("Provided user is the last member of this Desk. Initiate desk deletion...");
+				await DeleteEntireDeskAsync(deskId);
+				return;
+			}
 
-				var deskLanes = await _context.DeskLanes
-					.Where(dl => dl.DeskId == desk.Id)
+			var deskUserToBeRemoved = deskUsers.FirstOrDefault(du => du.UserId == userId)
+			?? throw new Exception("Provided user is not a member of this desk");
+
+			var cardUsers = await (
+				from cu in _context.CardUsers
+				join lc in _context.LaneCards on cu.CardId equals lc.CardId
+				join dl in _context.DeskLanes on lc.LaneId equals dl.LaneId
+				where dl.DeskId == deskId && cu.UserId == userId
+				select cu.Id
+			).ToListAsync();
+
+			_logger.LogInformation("Removing user from {Count} Cards...", cardUsers.Count);
+			await _context.CardUsers.Where(cu => cardUsers.Contains(cu.Id)).ExecuteDeleteAsync();
+
+			if (deskUserToBeRemoved.UserDeskRole.Name == "Admin")
+			{
+				var otherMembers = await _context.DeskUsers
+					.Include(du => du.UserDeskRole)
+					.Where(du => du.DeskId == deskId && du.UserId != userId)
 					.ToListAsync();
 
-				var laneIds = deskLanes
-					.Select(dl => dl.LaneId)
-					.ToList();
+				var admins = otherMembers.Where(du => du.UserDeskRole.Name == "Admin").ToList();
 
-				var lanes = await _context.Lanes
-					.Where(l => laneIds.Contains(l.Id))
-					.ToListAsync();
+				if (admins.Count == 0)
+				{
+					_logger.LogInformation("User to be removed is of role type 'Admin'. Transfering admin role...");
 
-				var laneCards = await _context.LaneCards
-					.Where(lc => laneIds.Contains(lc.LaneId))
-					.ToListAsync();
+					var randomIndex = Random.Shared.Next(0, otherMembers.Count);
+					var newAdmin = otherMembers[randomIndex];
+					newAdmin.UserDeskRoleId = deskUserToBeRemoved.UserDeskRoleId;
 
-				var cardIds = laneCards.Select(lc => lc.CardId).ToList();
+					_logger.LogInformation("Admin role transfered to other desk member (Id: {UserId})", newAdmin.UserId);
+				}
+			}
 
-				var cards = await _context.Cards
-					.Where(c => cardIds.Contains(c.Id))
-					.ToListAsync();
+			_context.DeskUsers.Remove(deskUserToBeRemoved);
+			await _context.SaveChangesAsync();
+		}
 
-				await _context.DeskLanes.Where(dl => laneIds.Contains(dl.LaneId)).ExecuteDeleteAsync();
-				await _context.LaneCards.Where(lc => laneIds.Contains(lc.LaneId)).ExecuteDeleteAsync();
+		private async Task DeleteEntireDeskAsync(int deskId)
+		{
+			_logger.LogInformation("Deleting Desk (Id: {DeskId}) and all related entities...", deskId);
+			
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				var cardIds = await (
+					from c in _context.Cards
+					join lc in _context.LaneCards on c.Id equals lc.CardId
+					join l in _context.Lanes on lc.LaneId equals l.Id
+					join dl in _context.DeskLanes on l.Id equals dl.LaneId
+					where dl.DeskId == deskId
+					select c.Id
+				).ToListAsync();
 
-				_context.Lanes.RemoveRange(lanes);
-				_context.Cards.RemoveRange(cards);
-				_context.Desks.Remove(desk);
+				_logger.LogInformation("Deleting {Count} Cards...", cardIds.Count);
+				await _context.CardUsers.Where(cu => cardIds.Contains(cu.CardId)).ExecuteDeleteAsync();
+				await _context.LaneCards.Where(lc => cardIds.Contains(lc.CardId)).ExecuteDeleteAsync();
+				await _context.Cards.Where(c => cardIds.Contains(c.Id)).ExecuteDeleteAsync();
+
+				var laneIds = await (
+					from l in _context.Lanes
+					join dl in _context.DeskLanes on l.Id equals dl.LaneId
+					where dl.DeskId == deskId
+					select l.Id
+				).ToListAsync();
+
+				_logger.LogInformation("Deleting {Count} Lanes...", laneIds.Count);
+				await _context.DeskLanes.Where(dl => dl.DeskId == deskId).ExecuteDeleteAsync();
+				await _context.Lanes.Where(l => laneIds.Contains(l.Id)).ExecuteDeleteAsync();
+
+				_logger.LogInformation("Deleting Invitations...");
+
+				await _inviteService.DeleteAllInvitationsByDeskIdAsync(deskId);
+
+				_logger.LogInformation("Deleting Desk...");
+
+				await _context.DeskUsers.Where(ud => ud.DeskId == deskId).ExecuteDeleteAsync();
+				await _context.Desks.Where(d => d.Id == deskId).ExecuteDeleteAsync();
 
 				await _context.SaveChangesAsync();
+				await transaction.CommitAsync();
 			}
-			else
+			catch (Exception ex)
 			{
-				// TBD HERE: handle leaving of desk with other members
+				_logger.LogInformation(ex, "Error while deleting Desk (Id: {DeskId})", deskId);
+				await transaction.RollbackAsync();
+				throw new Exception("Unable to delete Desk");
 			}
 		}
+
+		
 	}
 }

@@ -9,6 +9,6 @@ namespace CollabTaskApi.Application.Interfaces
 		Task<IEnumerable<Desk>> GetAllDesksAsync(int userId);
 		Task<IEnumerable<BoardDeskDto>> GetBoardDeskDtos(int userId);
 		Task<BoardDeskDto> CreateAsync(int userId, CreateDeskDto dto);
-		Task HandleUserLeaveAsync(int userId, Desk desk);
+		Task RemoveUserFromDeskAsync(int userId, int deskId);
 	}
 }
