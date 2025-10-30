@@ -1,5 +1,6 @@
 ﻿using CollabTaskApi.Application.Interfaces;
 using CollabTaskApi.Domain.DTOs.Board;
+using CollabTaskApi.Domain.Models;
 using CollabTaskApi.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,17 +31,59 @@ namespace CollabTaskApi.Application.Services
 			return dtos;
 		}
 
+		public async Task SendInvitationAsync(int senderId, string receiverEmail, int deskId)
+		{
+			var senderExists = await _context.Users.AnyAsync(u => u.Id == senderId);
+			if(!senderExists) throw new Exception("Sending user not found");
+
+			var receivingUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == receiverEmail)
+			?? throw new Exception("Receiving user not found");
+
+			var deskExists = await _context.Desks.AnyAsync(d => d.Id == deskId);
+			if (!deskExists) throw new Exception("Desk not found");
+
+			var alreadyMember = await _context.DeskUsers.AnyAsync(du => du.DeskId == deskId && du.UserId == receivingUser.Id);
+			if (alreadyMember) throw new Exception("Receiving user is already a desk member");
+
+			var inviteAlreadySent = await _context.DeskInvitations.AnyAsync(i => i.DeskId == deskId && i.ReceiverUserId == receivingUser.Id);
+			if (inviteAlreadySent) throw new Exception("User has already been invited");
+
+			var deskInvitation = new DeskInvitation
+			{
+				SenderUserId = senderId,
+				ReceiverUserId = receivingUser.Id,
+				DeskId = deskId,
+				CreatedAt = DateTime.UtcNow
+			};
+
+			await _context.DeskInvitations.AddAsync(deskInvitation);
+			await _context.SaveChangesAsync();
+		}
+
 		public async Task<BoardDeskDto> AcceptInvitationAsync(int inviteId)
 		{
 			var invite = await _context.DeskInvitations.SingleOrDefaultAsync(i => i.Id == inviteId)
 			?? throw new ArgumentException("Invitation not found");
 
-			await _deskService.AddUserToDeskAsync(invite.ReceiverUserId, invite.DeskId);
+			var desk = await _deskService.GetByIdAsync(invite.DeskId)
+			?? throw new Exception("Desk not found");
+
+			var deskType = await _context.UserDeskTypes.FirstOrDefaultAsync(t => t.Name == "Shared")
+			?? throw new Exception("User desk type not found");
+
+			await _deskService.AddUserToDeskAsync(invite.ReceiverUserId, desk.Id);
 
 			_context.DeskInvitations.Remove(invite);
 			await _context.SaveChangesAsync();
 
-			return new BoardDeskDto();
+			return new BoardDeskDto
+			{
+				DeskId = desk.Id,
+				Name = desk.Name,
+				Color = desk.Color,
+				CreatedAt = desk.CreatedAt,
+				UserDeskType = deskType.Name
+			};
 		}
 
 		public async Task DeclineInvitationAsync(int inviteId)

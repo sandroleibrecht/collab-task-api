@@ -15,6 +15,11 @@ namespace CollabTaskApi.Application.Services
 		private readonly ILogger<DeskService> _logger = logger;
 		private const string DefaultDeskColorHex = "#FFF";
 
+		public async Task<Desk?> GetByIdAsync(int deskId)
+		{
+			return await _context.Desks.FirstOrDefaultAsync(d => d.Id == deskId);
+		}
+
 		public async Task<IEnumerable<Desk>> GetAllDesksAsync(int userId)
 		{
 			var desks = await (
