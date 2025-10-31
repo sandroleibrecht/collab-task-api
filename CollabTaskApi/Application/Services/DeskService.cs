@@ -220,7 +220,7 @@ namespace CollabTaskApi.Application.Services
 					where dl.DeskId == deskId
 					select c.Id
 				).ToListAsync();
-
+				
 				_logger.LogInformation("Deleting {Count} Cards...", cardIds.Count);
 				await _context.CardUsers.Where(cu => cardIds.Contains(cu.CardId)).ExecuteDeleteAsync();
 				await _context.LaneCards.Where(lc => cardIds.Contains(lc.CardId)).ExecuteDeleteAsync();
@@ -239,8 +239,8 @@ namespace CollabTaskApi.Application.Services
 
 				_logger.LogInformation("Deleting Invitations...");
 
-				var invites = await _context.DeskInvitations.Where(i => i.DeskId == deskId).ExecuteDeleteAsync();
-
+				await _context.DeskInvitations.Where(i => i.DeskId == deskId).ExecuteDeleteAsync();
+				
 				_logger.LogInformation("Deleting Desk...");
 
 				await _context.DeskUsers.Where(ud => ud.DeskId == deskId).ExecuteDeleteAsync();
