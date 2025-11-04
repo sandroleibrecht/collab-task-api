@@ -36,9 +36,7 @@ namespace CollabTaskApi.Infrastructure
 
 		private static void AddDatabase(this IServiceCollection services, IConfiguration config)
 		{
-			services.AddDbContext<AppDbContext>(
-				options =>
-				options.UseSqlite(config.GetConnectionString("DefaultConnection")));
+			services.AddDbContext<AppDbContext>( options => options.UseSqlite(config.GetConnectionString("DefaultConnection")));
 		}
 
 		private static void AddFluentValidation(this IServiceCollection services)
@@ -48,8 +46,7 @@ namespace CollabTaskApi.Infrastructure
 
 		private static void ConfigureSerilog(this IHostBuilder host)
 		{
-			host.UseSerilog((context, loggerConfig) =>
-				loggerConfig.ReadFrom.Configuration(context.Configuration));
+			host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 		}
 
 		private static void AddOptions(this IServiceCollection services, IConfiguration config)
@@ -107,10 +104,7 @@ namespace CollabTaskApi.Infrastructure
 				};
 
 				c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-				c.AddSecurityRequirement(new OpenApiSecurityRequirement
-			{
-				{ jwtSecurityScheme, Array.Empty<string>() }
-			});
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement {{jwtSecurityScheme, Array.Empty<string>()}});
 			});
 		}
 	}
