@@ -4,7 +4,7 @@
 	{
 		public int Id { get; set; }
 		public string Name { get; set; } = string.Empty;
-
-		// TBD
+		public List<LaneDto> Lanes { get; set; } = [];
+		public List<MemberDto> Members { get; set; } = [];
 	}
 }

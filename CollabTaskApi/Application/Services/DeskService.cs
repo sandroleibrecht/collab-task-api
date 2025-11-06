@@ -20,6 +20,52 @@ namespace CollabTaskApi.Application.Services
 			return await _context.Desks.FirstOrDefaultAsync(d => d.Id == deskId);
 		}
 
+		public async Task<DeskDto> GetDeskViewAsync(int userId, int deskId)
+		{
+			var desk = await GetByIdAsync(deskId) ?? throw new Exception("Desk not found");
+
+			var deskMembers = await _context.DeskUsers
+				.Include(du => du.User)
+				.Include(du => du.UserDeskRole)
+				.Where(du => du.DeskId == desk.Id)
+				.ToListAsync();
+			if (!deskMembers.Any(dm => dm.UserId == userId)) throw new Exception("User is not a member of this desk");
+
+			var lanes = await (
+				from l in _context.Lanes
+				join dl in _context.DeskLanes on l.Id equals dl.LaneId
+				where dl.DeskId == desk.Id
+				select l
+			).ToListAsync();
+
+			var cards = await (
+				from c in _context.Cards
+				join lc in _context.LaneCards on c.Id equals lc.CardId
+				where lanes.Select(l => l.Id).Contains(lc.LaneId)
+				select c
+			).ToListAsync();
+
+			List <MemberDto> memberDtos = [];
+
+			foreach(var member in deskMembers)
+			{
+				memberDtos.Add(new MemberDto
+				{
+					Id = member.Id,
+					Name = member.User.Name,
+					UserDeskRole = member.UserDeskRole.Name
+				});
+			}
+
+			return new DeskDto
+			{
+				Id = desk.Id,
+				Name = desk.Name,
+				Lanes = [],
+				Members = memberDtos
+			};
+		}
+
 		public async Task<IEnumerable<Desk>> GetAllDesksAsync(int userId)
 		{
 			var desks = await (

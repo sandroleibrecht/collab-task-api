@@ -20,16 +20,14 @@ namespace CollabTaskApi.Controllers
 		private readonly IDeskService _deskService = deskService;
 
 		[HttpGet("{deskId:int}")]
-		public async Task<ActionResult<DeskDto>> Get(int deskId)
+		public async Task<ActionResult<DeskDto>> GetDeskView(int deskId)
 		{
 			var userId = User.GetUserId();
 			if (userId is null) return Unauthorized();
 
-			return new DeskDto
-			{
-				Id = deskId,
-				Name = "Test"
-			};
+			var deskView = await _deskService.GetDeskViewAsync((int)userId, deskId);
+
+			return deskView;
 		}
 
 		[HttpPost]
