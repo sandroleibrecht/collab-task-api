@@ -29,24 +29,45 @@ namespace CollabTaskApi.Application.Services
 				.Include(du => du.UserDeskRole)
 				.Where(du => du.DeskId == desk.Id)
 				.ToListAsync();
+
 			if (!deskMembers.Any(dm => dm.UserId == userId)) throw new Exception("User is not a member of this desk");
 
-			var lanes = await (
-				from l in _context.Lanes
-				join dl in _context.DeskLanes on l.Id equals dl.LaneId
-				where dl.DeskId == desk.Id
-				select l
-			).ToListAsync();
-
-			var cards = await (
-				from c in _context.Cards
-				join lc in _context.LaneCards on c.Id equals lc.CardId
-				where lanes.Select(l => l.Id).Contains(lc.LaneId)
-				select c
-			).ToListAsync();
+			var lanes = await _context.Lanes
+				.Select(lane => new LaneDto
+				{
+					Id = lane.Id,
+					Order = lane.Order,
+					CreatedAt = lane.CreatedAt,
+					Cards = (
+						from lc in _context.LaneCards
+						join c in _context.Cards on lc.CardId equals c.Id
+						where lc.LaneId == lane.Id
+						select new CardDto
+						{
+							Id = c.Id,
+							Name = c.Name,
+							Description = c.Description,
+							Order = c.Order,
+							CreatedAt = c.CreatedAt,
+							CardMembers = (
+								from cu in _context.CardUsers
+								join u in _context.Users on cu.UserId equals u.Id
+								join du in _context.DeskUsers on u.Id equals du.UserId
+								join udr in _context.UserDeskRoles on du.UserDeskRoleId equals udr.Id
+								where cu.CardId == c.Id
+								select new MemberDto
+								{
+									Id = u.Id,
+									Name = u.Name,
+									UserDeskRole = udr.Name
+								}
+							).ToList()
+						}
+					).ToList()
+				})
+				.ToListAsync();
 
 			List <MemberDto> memberDtos = [];
-
 			foreach(var member in deskMembers)
 			{
 				memberDtos.Add(new MemberDto
@@ -61,7 +82,7 @@ namespace CollabTaskApi.Application.Services
 			{
 				Id = desk.Id,
 				Name = desk.Name,
-				Lanes = [],
+				Lanes = lanes,
 				Members = memberDtos
 			};
 		}
