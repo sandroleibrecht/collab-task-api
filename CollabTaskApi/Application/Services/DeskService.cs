@@ -32,7 +32,10 @@ namespace CollabTaskApi.Application.Services
 
 			if (!deskMembers.Any(dm => dm.UserId == userId)) throw new Exception("User is not a member of this desk");
 
-			var lanes = await _context.Lanes
+			var lanes = await _context.DeskLanes
+				.Where(dl => dl.DeskId == deskId)
+				.Include(dl => dl.Lane)
+				.Select(dl => dl.Lane)
 				.Select(lane => new LaneDto
 				{
 					Id = lane.Id,
@@ -67,16 +70,13 @@ namespace CollabTaskApi.Application.Services
 				})
 				.ToListAsync();
 
-			List <MemberDto> memberDtos = [];
-			foreach(var member in deskMembers)
-			{
-				memberDtos.Add(new MemberDto
-				{
-					Id = member.Id,
-					Name = member.User.Name,
-					UserDeskRole = member.UserDeskRole.Name
-				});
-			}
+			var memberDtos = deskMembers
+				.Select(dm => new MemberDto
+				{ 
+					Id = dm.Id,
+					Name = dm.User.Name,
+					UserDeskRole = dm.UserDeskRole.Name
+				}).ToList();
 
 			return new DeskDto
 			{
