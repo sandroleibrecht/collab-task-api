@@ -322,8 +322,6 @@ namespace CollabTaskApi.Application.Services
 				await transaction.RollbackAsync();
 				throw new Exception("Unable to delete Desk");
 			}
-		}
-
-		
+		}	
 	}
 }

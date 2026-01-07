@@ -26,28 +26,27 @@ namespace CollabTaskApi.Application.Services
 		{
 			var currentImage = await GetUserImageAsync(userId);
 
-			if (string.IsNullOrEmpty(filePath) && currentImage is null)
-				return null;
-
-			if (string.IsNullOrEmpty(filePath) && currentImage is not null)
-				return currentImage.FilePath;
-
-			if (!string.IsNullOrEmpty(filePath))
+			if (string.IsNullOrEmpty(filePath))
 			{
-				if (currentImage is not null)
-				{
-					currentImage.FilePath = filePath;
-				}
-				else
-				{
-					await _context.UserImages.AddAsync(new UserImage
-					{
-						UserId = userId,
-						FilePath = filePath
-					});
-				}
-				await _context.SaveChangesAsync();
+				return currentImage?.FilePath;
 			}
+
+			if (currentImage is not null)
+			{
+				currentImage.FilePath = filePath;
+			}
+			else
+			{
+				UserImage img = new()
+				{
+					UserId = userId,
+					FilePath = filePath
+				};
+
+				await _context.UserImages.AddAsync(img);
+			}
+
+			await _context.SaveChangesAsync();
 
 			return filePath;
 		}
