@@ -18,14 +18,7 @@ namespace CollabTaskApi
 
 			var app = builder.Build();
 
-			if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
 			app.UseInfrastructure();
-
 			app.UseHttpsRedirection();
 			app.UseAuthentication();
             app.UseAuthorization();

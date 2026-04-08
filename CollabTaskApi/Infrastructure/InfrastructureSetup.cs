@@ -4,10 +4,11 @@ using CollabTaskApi.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Text;
 using FluentValidation;
 using Serilog;
+using Scalar.AspNetCore;
 
 namespace CollabTaskApi.Infrastructure
 {
@@ -15,23 +16,40 @@ namespace CollabTaskApi.Infrastructure
 	{
 		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config, IHostBuilder host)
 		{
+			host.ConfigureSerilog();
 			services.AddDatabase(config);
 			services.AddHostedService<TokenCleanupService>();
 			services.AddOptions(config);
 			services.AddJwtAuthentication(config);
-			services.AddSwaggerDocumentation();
+			services.AddOpenApiConfig();
 			services.AddFluentValidation();
-			host.ConfigureSerilog();
 			services.AddAuthorization();
 
 			return services;
 		}
 
-		public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app)
+		public static IApplicationBuilder UseInfrastructure(this WebApplication app)
 		{
 			app.UseSerilogRequestLogging();
 
+			if (app.Environment.IsDevelopment())
+			{
+				app.MapOpenApi();
+				app.MapScalarApiReference(options =>
+				{
+					options
+						.WithTitle("Collab Task API")
+						.WithTheme(ScalarTheme.Purple)
+						.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+				});
+			}
+
 			return app;
+		}
+
+		private static void ConfigureSerilog(this IHostBuilder host)
+		{
+			host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 		}
 
 		private static void AddDatabase(this IServiceCollection services, IConfiguration config)
@@ -42,11 +60,6 @@ namespace CollabTaskApi.Infrastructure
 		private static void AddFluentValidation(this IServiceCollection services)
 		{
 			services.AddValidatorsFromAssemblyContaining<Program>();
-		}
-
-		private static void ConfigureSerilog(this IHostBuilder host)
-		{
-			host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 		}
 
 		private static void AddOptions(this IServiceCollection services, IConfiguration config)
@@ -82,29 +95,34 @@ namespace CollabTaskApi.Infrastructure
 				});
 		}
 
-		private static void AddSwaggerDocumentation(this IServiceCollection services)
+		private static void AddOpenApiConfig(this IServiceCollection services)
 		{
-			services.AddSwaggerGen(c =>
+			services.AddOpenApi(options =>
 			{
-				c.SwaggerDoc("v1", new OpenApiInfo { Title = "CollabTask API", Version = "v1" });
-
-				var jwtSecurityScheme = new OpenApiSecurityScheme
+				options.AddDocumentTransformer((document, context, cancellationToken) =>
 				{
-					BearerFormat = "JWT",
-					Name = "Authorization",
-					In = ParameterLocation.Header,
-					Type = SecuritySchemeType.Http,
-					Scheme = "bearer",
-					Description = "Enter your AccessToken below.",
-					Reference = new OpenApiReference
+					document.Components = new OpenApiComponents
 					{
-						Id = JwtBearerDefaults.AuthenticationScheme,
-						Type = ReferenceType.SecurityScheme
-					}
-				};
+						SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>()
+					};
 
-				c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-				c.AddSecurityRequirement(new OpenApiSecurityRequirement {{jwtSecurityScheme, Array.Empty<string>()}});
+					document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+					{
+						Type = SecuritySchemeType.Http,
+						Scheme = "bearer",
+						BearerFormat = "JWT",
+						Description = "Insert token here (excluding 'Bearer')"
+					};
+
+					document.Security = [
+						new OpenApiSecurityRequirement
+						{
+							[new OpenApiSecuritySchemeReference("Bearer", document)] = []
+						}
+					];
+
+					return Task.CompletedTask;
+				});
 			});
 		}
 	}
