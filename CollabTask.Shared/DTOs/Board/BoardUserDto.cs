@@ -1,4 +1,4 @@
-﻿namespace CollabTask.Api.Domain.DTOs.Board
+﻿namespace CollabTask.Shared.DTOs.Board
 {
 	public class BoardUserDto
 	{

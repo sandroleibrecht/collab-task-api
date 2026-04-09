@@ -1,5 +1,5 @@
 ﻿using CollabTask.Api.Application.Interfaces;
-using CollabTask.Api.Domain.DTOs.Board;
+using CollabTask.Shared.DTOs.Board;
 
 namespace CollabTask.Api.Application.Services
 {

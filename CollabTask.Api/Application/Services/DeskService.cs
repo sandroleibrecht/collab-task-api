@@ -3,7 +3,7 @@ using CollabTask.Api.Infrastructure.Data;
 using CollabTask.Api.Domain.DTOs.Desk;
 using CollabTask.Api.Application.Interfaces;
 using CollabTask.Api.Domain.Models;
-using CollabTask.Api.Domain.DTOs.Board;
+using CollabTask.Shared.DTOs.Board;
 
 namespace CollabTask.Api.Application.Services
 {

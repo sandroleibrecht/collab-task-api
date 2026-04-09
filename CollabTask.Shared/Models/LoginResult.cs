@@ -1,8 +1,8 @@
-﻿using CollabTask.Shared.Models;
+﻿using CollabTask.Shared.DTOs.Auth;
 
-namespace CollabTask.Shared.DTOs.Auth
+namespace CollabTask.Shared.Models
 {
-	public class LoginResultDto
+	public class LoginResult
 	{
 		public bool IsSuccess { get; set; }
 		public AuthResponseDto? UserData { get; set; }

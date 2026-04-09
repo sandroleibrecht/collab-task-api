@@ -1,4 +1,4 @@
-﻿using CollabTask.Api.Domain.DTOs.Board;
+﻿using CollabTask.Shared.DTOs.Board;
 
 namespace CollabTask.Api.Application.Interfaces
 {

@@ -1,4 +1,4 @@
-﻿using CollabTask.ConsoleClient.DTOs;
+﻿using CollabTask.Shared.DTOs.Board;
 using CollabTask.ConsoleClient.UI.Interfaces;
 using System.Net.Http.Json;
 

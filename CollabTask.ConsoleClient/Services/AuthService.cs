@@ -12,28 +12,28 @@ public class AuthService(IConfiguration config, HttpClient httpClient) : IAuthSe
 	private readonly IConfiguration _config = config;
 	private readonly HttpClient _httpClient = httpClient;
 
-	public async Task<LoginResultDto> LoginAsync(SignInDto signInDto)
+	public async Task<LoginResult> LoginAsync(SignInDto signInDto)
 	{
 		var res = await _httpClient.PostAsJsonAsync("/api/auth/signin", signInDto);
 
 		if (res.IsSuccessStatusCode)
 		{
 			var userData = await res.Content.ReadFromJsonAsync<AuthResponseDto>();
-			return new LoginResultDto() { IsSuccess = true, UserData = userData };
+			return new LoginResult() { IsSuccess = true, UserData = userData };
 		}
 
 		if (res.StatusCode == HttpStatusCode.BadRequest)
 		{
 			var validationErrors = await res.Content.ReadFromJsonAsync<List<ValidationFailure>>();
-			return new LoginResultDto() { IsSuccess = false, ErrorMessage = "Validation errors have occurred.", ValidationErrors = validationErrors };
+			return new LoginResult() { IsSuccess = false, ErrorMessage = "Validation errors have occurred.", ValidationErrors = validationErrors };
 		}
 
 		if (res.StatusCode == HttpStatusCode.Unauthorized)
 		{
-			return new LoginResultDto() { IsSuccess = false, ErrorMessage = "Credentials are invalid." };
+			return new LoginResult() { IsSuccess = false, ErrorMessage = "Credentials are invalid." };
 		}
 
-		return new LoginResultDto() { IsSuccess = false, ErrorMessage = "An unexpected error has occurred."};
+		return new LoginResult() { IsSuccess = false, ErrorMessage = "An unexpected error has occurred."};
 	}
 
 	public bool TryToGetAdminCredentials(out SignInDto signInDto)
