@@ -1,6 +1,6 @@
 ﻿using CollabTask.Api.Domain.DTOs.Board;
-using CollabTask.Api.Domain.DTOs.User;
 using CollabTask.Api.Domain.Models;
+using CollabTask.Shared.DTOs.User;
 
 namespace CollabTask.Api.Application.Interfaces
 {

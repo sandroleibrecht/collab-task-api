@@ -1,4 +1,4 @@
-﻿namespace CollabTask.Api.Domain.DTOs.User
+﻿namespace CollabTask.Shared.DTOs.User
 {
 	public class UserUpdateDto
 	{

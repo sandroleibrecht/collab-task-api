@@ -1,6 +1,6 @@
-﻿using CollabTask.Api.Domain.DTOs.User;
+﻿using CollabTask.Shared.DTOs.User;
 
-namespace CollabTask.Api.Domain.DTOs.Auth
+namespace CollabTask.Shared.DTOs.Auth
 {
 	public class AuthResponseDto
 	{

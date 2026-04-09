@@ -1,4 +1,4 @@
-﻿using CollabTask.Api.Domain.DTOs.Auth;
+﻿using CollabTask.Shared.DTOs.Auth;
 using CollabTask.Api.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;

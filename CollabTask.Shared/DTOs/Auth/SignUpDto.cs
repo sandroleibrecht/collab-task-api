@@ -1,7 +1,8 @@
-﻿namespace CollabTask.Shared.DTOs
+﻿namespace CollabTask.Shared.DTOs.Auth
 {
-	public class SignInDto
+	public class SignUpDto
 	{
+		public string Name { get; set; } = string.Empty;
 		public string Email { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
 	}

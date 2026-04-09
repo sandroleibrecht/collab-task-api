@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using System.Text.RegularExpressions;
-using CollabTask.Api.Domain.DTOs.Auth;
+using CollabTask.Shared.DTOs.Auth;
 
 namespace CollabTask.Api.Domain.Validation
 {

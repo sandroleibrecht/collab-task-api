@@ -1,5 +1,5 @@
 ﻿using CollabTask.Api.Application.Interfaces;
-using CollabTask.Api.Domain.DTOs.Auth;
+using CollabTask.Shared.DTOs.Auth;
 using CollabTask.Api.Domain.Models;
 using CollabTask.Api.Infrastructure.Configuration;
 using CollabTask.Api.Infrastructure.Data;

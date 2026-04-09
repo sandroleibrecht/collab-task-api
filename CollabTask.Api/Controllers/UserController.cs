@@ -1,6 +1,6 @@
 ﻿using CollabTask.Api.Application.Interfaces;
 using CollabTask.Api.Domain.DTOs.Board;
-using CollabTask.Api.Domain.DTOs.User;
+using CollabTask.Shared.DTOs.User;
 using CollabTask.Api.Shared.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;

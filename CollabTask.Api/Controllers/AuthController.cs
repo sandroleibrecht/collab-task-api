@@ -2,7 +2,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using CollabTask.Api.Application.Interfaces;
-using CollabTask.Api.Domain.DTOs.Auth;
+using CollabTask.Shared.DTOs.Auth;
 
 namespace CollabTask.Api.Controllers
 {

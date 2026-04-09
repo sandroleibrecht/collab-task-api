@@ -1,7 +1,7 @@
 ﻿using CollabTask.Api.Shared.Helpers;
 using CollabTask.Api.Application.Interfaces;
-using CollabTask.Api.Domain.DTOs.Auth;
-using CollabTask.Api.Domain.DTOs.User;
+using CollabTask.Shared.DTOs.Auth;
+using CollabTask.Shared.DTOs.User;
 using CollabTask.Api.Domain.Models;
 
 namespace CollabTask.Api.Application.Services

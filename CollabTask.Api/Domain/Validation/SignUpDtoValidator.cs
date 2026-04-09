@@ -1,4 +1,4 @@
-﻿using CollabTask.Api.Domain.DTOs.Auth;
+﻿using CollabTask.Shared.DTOs.Auth;
 using FluentValidation;
 using System.Text.RegularExpressions;
 

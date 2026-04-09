@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using Serilog;
-using CollabTask.Shared.DTOs;
+using CollabTask.Shared.DTOs.Auth;
 using CollabTask.ConsoleClient.DTOs;
 using CollabTask.ConsoleClient.Services.Interfaces;
 using CollabTask.ConsoleClient.UI.Interfaces;
