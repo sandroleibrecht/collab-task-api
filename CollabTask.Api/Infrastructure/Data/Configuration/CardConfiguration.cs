@@ -1,0 +1,21 @@
+﻿using CollabTask.Api.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace CollabTask.Api.Infrastructure.Data.Configuration
+{
+	public class CardConfiguration :IEntityTypeConfiguration<Card>
+	{
+		public void Configure(EntityTypeBuilder<Card> builder)
+		{
+			builder.ToTable("Card");
+
+			builder.HasKey(e => e.Id);
+
+			builder.Property(e => e.Name).IsRequired();
+			builder.Property(e => e.Description);
+			builder.Property(e => e.Order).IsRequired();
+			builder.Property(e => e.CreatedAt).IsRequired();
+		}
+	}
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CollabTask.Api/CollabTask.Api.csproj" />
+  <Project Path="CollabTask.ConsoleClient/CollabTask.ConsoleClient.csproj" />
+  <Project Path="CollabTask.Shared/CollabTask.Shared.csproj" Id="ba28c04c-0e08-4713-9364-f8afc6461fda" />
+</Solution>

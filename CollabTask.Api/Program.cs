@@ -1,0 +1,30 @@
+using CollabTask.Api.Application;
+using CollabTask.Api.Infrastructure;
+using CollabTask.Api.Shared;
+
+namespace CollabTask.Api
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+			builder.Services.AddControllers();
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddApplication();
+			builder.Services.AddInfrastructure(builder.Configuration, builder.Host);
+			builder.Services.AddShared();
+
+			var app = builder.Build();
+
+			app.UseInfrastructure();
+			app.UseHttpsRedirection();
+			app.UseAuthentication();
+            app.UseAuthorization();
+			app.MapControllers();
+
+            app.Run();
+        }
+    }
+}

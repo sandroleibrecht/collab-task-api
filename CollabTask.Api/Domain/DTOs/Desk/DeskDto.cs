@@ -1,0 +1,10 @@
+﻿namespace CollabTask.Api.Domain.DTOs.Desk
+{
+	public class DeskDto
+	{
+		public int Id { get; set; }
+		public string Name { get; set; } = string.Empty;
+		public List<LaneDto> Lanes { get; set; } = [];
+		public List<MemberDto> Members { get; set; } = [];
+	}
+}
