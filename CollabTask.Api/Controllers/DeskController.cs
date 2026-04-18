@@ -1,6 +1,6 @@
 ﻿using CollabTask.Api.Application.Interfaces;
 using CollabTask.Shared.DTOs.Board;
-using CollabTask.Api.Domain.DTOs.Desk;
+using CollabTask.Shared.DTOs.Desk;
 using CollabTask.Api.Shared.Extensions;
 using FluentValidation;
 using FluentValidation.Results;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CollabTask.Api.Infrastructure.Data;
-using CollabTask.Api.Domain.DTOs.Desk;
+using CollabTask.Shared.DTOs.Desk;
 using CollabTask.Api.Application.Interfaces;
 using CollabTask.Api.Domain.Models;
 using CollabTask.Shared.DTOs.Board;

@@ -1,4 +1,4 @@
-﻿namespace CollabTask.Api.Domain.DTOs.Desk
+﻿namespace CollabTask.Shared.DTOs.Desk
 {
 	public class CreateDeskDto
 	{

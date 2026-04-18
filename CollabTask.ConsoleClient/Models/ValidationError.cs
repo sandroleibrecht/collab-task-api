@@ -1,6 +1,6 @@
-﻿namespace CollabTask.Shared.Models
+﻿namespace CollabTask.ConsoleClient.Models
 {
-	public class ValidationFailure
+	public class ValidationError
 	{
 		public string PropertyName { get; set; } = string.Empty;
 		public string ErrorMessage { get; set; } = string.Empty;

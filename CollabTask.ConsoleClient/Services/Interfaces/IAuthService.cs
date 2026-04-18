@@ -1,10 +1,11 @@
-﻿using CollabTask.Shared.DTOs.Auth;
-using CollabTask.Shared.Models;
+﻿using CollabTask.ConsoleClient.Models;
+using CollabTask.Shared.DTOs.Auth;
 
 namespace CollabTask.ConsoleClient.Services.Interfaces;
 
 public interface IAuthService
 {
-	Task<LoginResult> LoginAsync(SignInDto signInDto);
-	bool TryToGetAdminCredentials(out SignInDto signInDto);
+	Task<LoginResult> SignInAsync(SignInDto signInDto);
+	Task<LoginResult> SignUpAsync(SignUpDto signUpDto);
+	bool TryToBuildAdminSignInDto(out SignInDto signInDto);
 }

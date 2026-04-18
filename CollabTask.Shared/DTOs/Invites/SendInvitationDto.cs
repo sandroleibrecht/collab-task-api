@@ -1,4 +1,4 @@
-﻿namespace CollabTask.Api.Domain.DTOs.Invites
+﻿namespace CollabTask.Shared.DTOs.Invites
 {
 	public class SendInvitationDto
 	{

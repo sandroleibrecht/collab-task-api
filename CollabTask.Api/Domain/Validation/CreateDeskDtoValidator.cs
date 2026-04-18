@@ -1,4 +1,4 @@
-﻿using CollabTask.Api.Domain.DTOs.Desk;
+﻿using CollabTask.Shared.DTOs.Desk;
 using FluentValidation;
 
 namespace CollabTask.Api.Domain.Validation

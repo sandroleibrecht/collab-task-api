@@ -2,9 +2,9 @@
 using System.Text.Json;
 using Serilog;
 using CollabTask.Shared.DTOs.Auth;
-using CollabTask.ConsoleClient.DTOs;
 using CollabTask.ConsoleClient.Services.Interfaces;
 using CollabTask.ConsoleClient.UI.Interfaces;
+using CollabTask.ConsoleClient.Models;
 
 namespace CollabTask.ConsoleClient.UI.Views;
 
@@ -19,16 +19,13 @@ public class AuthView(AppState appState, HttpClient client, ILogger logger, IAut
 	{
 		Console.WriteLine("== Login ==");
 
-		SignInDto signInDto = new();
 		bool loginAsAdmin = false;
 
-		if (_authService.TryToGetAdminCredentials(out signInDto))
+		if (_authService.TryToBuildAdminSignInDto(out SignInDto signInDto))
 		{
 			Console.WriteLine("Admin credentials detected. Do you want to login as admin? [Y]es/[N]o");
 			loginAsAdmin = Console.ReadLine()?.ToLower() == "y";
 		}
-
-		//var loginResult = await _authService.LoginAsync(signInDto);
 
 		while (true)
 		{
@@ -51,17 +48,26 @@ public class AuthView(AppState appState, HttpClient client, ILogger logger, IAut
 				}
 			}
 
-			var authRes = await _client.PostAsJsonAsync("/api/auth/signin", signInDto);
-			
-			AuthResponseDto? content;
+			LoginResult loginResult = await _authService.SignInAsync(signInDto);
 
-			if (!authRes.IsSuccessStatusCode)
+			if (!loginResult.IsSuccess)
 			{
+				if (!string.IsNullOrEmpty(loginResult.ErrorMessage))
+				{
+					Console.WriteLine(loginResult.ErrorMessage);
+				}
+
+				if (loginResult.ValidationErrors != null && loginResult.ValidationErrors.Count != 0)
+				{
+					foreach (var err in loginResult.ValidationErrors)
+					{
+						Console.WriteLine($"{err.ErrorMessage}");
+					}
+				}
+
 				Console.WriteLine("Login failed. [L]ogin, [S]ign up");
 
-				var action = Console.ReadLine();
-
-				if (action is "L" or (not "L" and not "S"))
+				if (Console.ReadLine() is "L" or (not "L" and not "S"))
 				{
 					loginAsAdmin = false;
 					continue;
@@ -70,47 +76,60 @@ public class AuthView(AppState appState, HttpClient client, ILogger logger, IAut
 				while (true)
 				{
 					Console.WriteLine("== Sign up ==");
+
 					Console.Write("Username: ");
-					var userName = Console.ReadLine();
+					var nameInput = Console.ReadLine();
+
 					Console.Write("Email: ");
-					var userMail = Console.ReadLine();
+					var emailInput = Console.ReadLine();
+					
 					Console.Write("Password: ");
-					var userPass = Console.ReadLine();
+					var passInput = Console.ReadLine();
 
-					var adminSignUp = new { Name = userName, Email = userMail, Password =  userPass};
-					var signUpRes = await _client.PostAsJsonAsync("/api/auth/signup", adminSignUp);
-
-					if (!signUpRes.IsSuccessStatusCode)
+					if (string.IsNullOrEmpty(nameInput) || string.IsNullOrEmpty(emailInput) || string.IsNullOrEmpty(passInput))
 					{
-						var errorContent = await signUpRes.Content.ReadAsStringAsync();
-						var errorJson = JsonDocument.Parse(errorContent);
+						continue;
+					}
 
-						foreach (var error in errorJson.RootElement.EnumerateArray())
+					SignUpDto signUpDto = new()
+					{
+						Name = nameInput,
+						Email = emailInput,
+						Password = passInput
+					};
+
+					loginResult = await _authService.SignUpAsync(signUpDto);
+
+					if (!loginResult.IsSuccess)
+					{
+						if (!string.IsNullOrEmpty(loginResult.ErrorMessage))
 						{
-							var errorMessage = error.GetProperty("errorMessage").GetString();
+							Console.WriteLine(loginResult.ErrorMessage);
+						}
 
-							Console.WriteLine($"{errorMessage}");
+						if (loginResult.ValidationErrors != null && loginResult.ValidationErrors.Count != 0)
+						{
+							foreach (var err in loginResult.ValidationErrors)
+							{
+								Console.WriteLine($"{err.ErrorMessage}");
+							}
 						}
 
 						continue;
 					}
-
-					content = await signUpRes.Content.ReadFromJsonAsync<AuthResponseDto>();
+					
 					break;
 				}
 			}
-			else
-			{
-				Console.WriteLine("Login success");
-				content = await authRes.Content.ReadFromJsonAsync<AuthResponseDto>();
-			}
 
-			if (content is null) throw new Exception("Authentication error");
+			var resContent = loginResult.UserData ?? throw new Exception("Unexpected authentication error");
 
-			_appState.UserName = content.User.Name;
-			_appState.UserEmail = content.User.Email;
-			_appState.UserAccessToken = content.AccessToken;
-			_appState.UserRefreshToken = content.RefreshToken;
+			Console.WriteLine("Login success");
+
+			_appState.UserName = resContent.User.Name;
+			_appState.UserEmail = resContent.User.Email;
+			_appState.UserAccessToken = resContent.AccessToken;
+			_appState.UserRefreshToken = resContent.RefreshToken;
 
 			_client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _appState.UserAccessToken);
 

@@ -21,7 +21,7 @@ namespace CollabTask.Api.Controllers
 
 		[HttpPost("signup")]
 		[ProducesResponseType<List<ValidationFailure>>(StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(StatusCodes.Status400BadRequest)]
+		[ProducesResponseType(StatusCodes.Status409Conflict)]
 		[ProducesResponseType<AuthResponseDto>(StatusCodes.Status200OK)]
 		public async Task<ActionResult<AuthResponseDto>> SignUp([FromBody] SignUpDto dto)
 		{
@@ -29,7 +29,7 @@ namespace CollabTask.Api.Controllers
 			if (!res.IsValid) return BadRequest(res.Errors);
 
 			var auth = await _authService.SignUpAsync(dto);
-			if (auth is null) return BadRequest();
+			if (auth is null) return Conflict("User already exists or registration failed.");
 
 			return Ok(auth);
 		}
@@ -37,7 +37,7 @@ namespace CollabTask.Api.Controllers
 		[HttpPost("signin")]
 		[ProducesResponseType<List<ValidationFailure>>(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK, "application/json")]
+		[ProducesResponseType<AuthResponseDto>(StatusCodes.Status200OK)]
 		public async Task<ActionResult<AuthResponseDto>> SignIn([FromBody] SignInDto dto)
 		{
 			var res = await _signInValidator.ValidateAsync(dto);
